@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { E2E_ADMIN_PASSWORD } from "../../playwright.config";
+import { APP_PORT, E2E_ADMIN_PASSWORD } from "../../playwright.config";
 
 /** Wspólne lokatory i kroki panelu — dzielone przez wszystkie spece `/admin`. */
 
@@ -17,7 +17,7 @@ export const TOTAL_LABEL = "Żądania łącznie";
 
 const MISCONFIGURED_SERVER =
   "Serwer testowy odrzucił poprawne hasło kodem `server`. Najczęstsza przyczyna: " +
-  "testy trafiły na obcy serwer dev na porcie 4321, uruchomiony bez zmiennych " +
+  `testy trafiły na obcy serwer dev na porcie ${APP_PORT}, uruchomiony bez zmiennych ` +
   "wstrzykiwanych przez playwright.config.ts (ADMIN_PASSWORD_HASH, AUTH_SECRET, LOG_SOURCE_URL).";
 
 const REGEX_SPECIALS = /[.*+?^${}()|[\]\\]/g;

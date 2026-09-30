@@ -4,8 +4,12 @@ import { join } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import { EVENTS_API_PREFIX, SEED_EVENTS } from "./tests/fixtures/events";
 
-const PORT = 4321;
-const BASE_URL = `http://localhost:${PORT}`;
+/**
+ * Osobny port zamiast domyślnego 4321 z `npm run dev`: ręcznie odpalony serwer
+ * czyta `.env.local` z produkcyjnym modułem wydarzeń i nie może trafić pod testy.
+ */
+export const APP_PORT = 4324;
+const BASE_URL = `http://localhost:${APP_PORT}`;
 
 const LOG_FIXTURE_HOST = "127.0.0.1";
 const LOG_FIXTURE_PORT = 4322;
@@ -134,9 +138,11 @@ export default defineConfig({
       },
     },
     {
-      command: `npm run dev -- --port ${PORT}`,
+      command: `npm run dev -- --port ${APP_PORT}`,
       url: BASE_URL,
-      reuseExistingServer: !process.env.CI,
+      // Przejęty serwer ignoruje `env` poniżej — 2026-09-30 testy CRUD zapisały tak
+      // rekordy do produkcji. Zajęty port ma wywalić start, a nie zostać użyty.
+      reuseExistingServer: false,
       env: {
         ADMIN_PASSWORD_HASH: build_admin_password_hash(E2E_ADMIN_PASSWORD),
         AUTH_SECRET: randomBytes(AUTH_SECRET_BYTES).toString("hex"),
