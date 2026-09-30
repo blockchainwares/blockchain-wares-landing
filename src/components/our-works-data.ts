@@ -307,7 +307,7 @@ export const SECTIONS: ProjectSection[] = [
     title: "EOS Ecosystem",
     subtitle: "Governance tools and smart contracts for the EOS blockchain",
     description:
-      "Delivered during the 2017–2019 EOS/BEOS era in collaboration with TerraDacs: a cross-platform desktop wallet for block producer voting, and two on-chain governance smart contracts for proxy registration and producer metadata.",
+      "Delivered during the 2017–2019 EOS/BEOS era in collaboration with TerraDacs: a cross-platform desktop wallet for block producer voting, and two on-chain governance smart contracts for proxy registration and producer metadata. Separately, we carried out a security audit for FIO Protocol, an EOSIO-based blockchain, in 2019–2020.",
     expertise_ids: ["blockchain", "engineering"],
     custom_icon: createElement(EngineeringIcon, { className: "w-full h-full" }),
     projects: [
@@ -325,6 +325,11 @@ export const SECTIONS: ProjectSection[] = [
         title: "Producer JSON",
         description:
           "Smart contract enabling EOS block producers to store and manage their JSON metadata on-chain. Validates producer eligibility and uses multi-index tables for efficient storage.",
+      },
+      {
+        title: "FIO Protocol Security Audit",
+        description:
+          "Security audit for FIO Protocol, an EOSIO-based blockchain (2019–2020).",
       },
     ],
   },
