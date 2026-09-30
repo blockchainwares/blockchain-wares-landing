@@ -754,6 +754,33 @@ line.frontend-props {
   }
 }
 
+/* 3 cycles, then stop: an endless float cost ~20 pts of CPU in Firefox. `backwards` holds 0.7
+   through the stagger delay; the settle has no fill on purpose (ends on the base opacity 1) */
+.logo-cube {
+  animation:
+    float-cube 2.5s ease-in-out var(--cube-delay, 0s) 3 backwards,
+    settle-cube 0.4s ease-out calc(var(--cube-delay, 0s) + 7.5s);
+}
+
+/* 800% / 381 = 8 user units of the 381-unit-tall viewBox */
+
+@keyframes float-cube {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(0, calc(-800% / 381), 0);
+    opacity: 1;
+  }
+}
+
+@keyframes settle-cube {
+  from {
+    opacity: 0.7;
+  }
+}
+
 /* Section headers - subtle entrance */
 .section-header {
   opacity: 0;
@@ -948,6 +975,10 @@ line.frontend-props {
 
   #splash-screen {
     display: none !important;
+  }
+
+  .logo-cube {
+    animation: none;
   }
 
 }
