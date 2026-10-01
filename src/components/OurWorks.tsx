@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { cn } from "../lib/utils";
 import { SectionHeader, SectionWrapper } from "./ui";
-import { useScrollAnimation, useAutoRotate } from "../hooks";
+import { useScrollAnimation, useAutoRotate, useInView } from "../hooks";
 import {
   SECTIONS,
   is_section_slug,
@@ -121,11 +121,13 @@ bootstrap_deep_link_scroll();
  * expertise grid block — competencies are surfaced organically inside the
  * portfolio.
  *
- * Auto-rotates through sections with a progress bar indicator. A `?tab=` or bare
- * `?slug` query opens that section directly and cancels the rotation.
+ * Auto-rotates through sections with a progress bar indicator, paused while the
+ * section is off-screen (`data-in-view`). A `?tab=` or bare `?slug` query opens
+ * that section directly and cancels the rotation.
  */
 export function OurWorks() {
   const { ref, is_visible } = useScrollAnimation<HTMLElement>();
+  const in_view = useInView(ref);
   const [active_id, set_active_id] = useState<string>(SECTIONS[0]?.id ?? "");
   const deep_link_handled = useRef(false);
 
@@ -143,6 +145,7 @@ export function OurWorks() {
     count: SECTIONS.length,
     active_index,
     on_change: handle_index_change,
+    in_view: in_view !== false,
   });
 
   const handle_select = useCallback(
@@ -185,6 +188,7 @@ export function OurWorks() {
     <section
       ref={ref}
       id={SECTION_ANCHOR_ID}
+      data-in-view={in_view === null ? undefined : String(in_view)}
       className={cn(
         "relative py-16 md:py-24 lg:py-32 px-4",
         is_visible && "is-visible"
