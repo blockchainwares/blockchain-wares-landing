@@ -21,7 +21,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         fillOpacity="0.1"
         stroke="currentColor"
         strokeWidth="2"
-        className="sdk-card-back"
+        opacity="0.7"
       />
 
       {/* Middle card */}
@@ -35,7 +35,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         fillOpacity="0.15"
         stroke="currentColor"
         strokeWidth="2"
-        className="sdk-card-mid"
+        opacity="0.85"
       />
 
       {/* Front card — main focal */}
@@ -49,11 +49,11 @@ export function SdkIcon({ className }: SdkIconProps) {
         fillOpacity="0.25"
         stroke="currentColor"
         strokeWidth="2.5"
-        className="sdk-card-front"
+        opacity="0.95"
       />
 
       {/* Small dot indicator (top-left of front card — like file/package marker) */}
-      <circle cx="70" cy="70" r="3" fill="currentColor" className="sdk-dot" />
+      <circle cx="70" cy="70" r="3" fill="currentColor" opacity="0.5" />
 
       {/* Left brace { */}
       <path
@@ -62,7 +62,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         strokeWidth="2.5"
         fill="none"
         strokeLinecap="round"
-        className="sdk-bracket-left"
+        opacity="0.7"
       />
 
       {/* Right brace } */}
@@ -72,7 +72,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         strokeWidth="2.5"
         fill="none"
         strokeLinecap="round"
-        className="sdk-bracket-right"
+        opacity="0.7"
       />
 
       {/* Code lines inside braces */}
@@ -84,8 +84,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        strokeOpacity="0.7"
-        className="sdk-line-1"
+        strokeOpacity="0.3"
       />
       <line
         x1="92"
@@ -95,8 +94,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        strokeOpacity="0.6"
-        className="sdk-line-2"
+        strokeOpacity="0.3"
       />
       <line
         x1="92"
@@ -106,8 +104,7 @@ export function SdkIcon({ className }: SdkIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        strokeOpacity="0.5"
-        className="sdk-line-3"
+        strokeOpacity="0.3"
       />
     </svg>
   );

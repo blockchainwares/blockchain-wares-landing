@@ -253,7 +253,7 @@ function SortIndicator({ state }: { state: SortDir | null }) {
     <span
       aria-hidden="true"
       className={cn(
-        "w-2 shrink-0 text-center transition-opacity duration-150",
+        "w-2 shrink-0 text-center",
         state === null
           ? "opacity-0 group-hover:opacity-60 group-focus-visible:opacity-60"
           : "text-secondary opacity-100",
@@ -306,7 +306,7 @@ export function LogsTable({ page, sort, dir, sortHref }: LogsTableProps) {
                     ) : (
                       <a
                         href={sortHref(sort_field)}
-                        className="group flex items-center gap-1 rounded-md text-xs font-semibold tracking-wide uppercase transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                        className="group flex items-center gap-1 rounded-md text-xs font-semibold tracking-wide uppercase hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
                       >
                         <span className={active ? "text-secondary" : undefined}>
                           {column.label}
@@ -334,7 +334,7 @@ export function LogsTable({ page, sort, dir, sortHref }: LogsTableProps) {
               items.map((log) => (
                 <tr
                   key={log.id}
-                  className="transition-colors duration-150 hover:bg-base-200/60"
+                  className="hover:bg-base-200/60"
                 >
                   {COLUMNS.map((column) => (
                     <td

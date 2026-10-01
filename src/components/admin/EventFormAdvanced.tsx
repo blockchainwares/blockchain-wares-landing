@@ -83,10 +83,10 @@ export function EventFormAdvanced({
       open={faulty}
       className="group rounded-md border border-base-300 bg-base-100"
     >
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md px-4 py-3 text-sm font-semibold transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary motion-reduce:transition-none [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-md px-4 py-3 text-sm font-semibold hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary [&::-webkit-details-marker]:hidden">
         <span
           aria-hidden="true"
-          className="inline-block transition-transform duration-150 group-open:rotate-90 motion-reduce:transition-none"
+          className="inline-block group-open:rotate-90"
         >
           ›
         </span>

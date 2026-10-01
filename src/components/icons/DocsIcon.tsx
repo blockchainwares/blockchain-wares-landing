@@ -21,7 +21,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         fillOpacity="0.12"
         stroke="currentColor"
         strokeWidth="2"
-        className="docs-page-back"
+        opacity="0.7"
       />
 
       {/* Front page — main document on top */}
@@ -35,7 +35,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         fillOpacity="0.18"
         stroke="currentColor"
         strokeWidth="2.5"
-        className="docs-page-front"
+        opacity="0.95"
       />
 
       {/* Corner fold (dog-ear) — top-right of front page */}
@@ -43,7 +43,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         d="M 142,18 L 154,18 L 154,30 Z"
         fill="currentColor"
         fillOpacity="0.3"
-        className="docs-corner-fold"
+        opacity="0.6"
       />
       <path
         d="M 142,18 L 142,30 L 154,30"
@@ -61,7 +61,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="2"
         fill="currentColor"
         fillOpacity="0.7"
-        className="docs-line-title"
+        opacity="0.4"
       />
 
       {/* Content lines 1-3 — text rows under title */}
@@ -73,7 +73,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1.25"
         fill="currentColor"
         fillOpacity="0.5"
-        className="docs-line-1"
+        opacity="0.4"
       />
       <rect
         x="72"
@@ -83,7 +83,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1.25"
         fill="currentColor"
         fillOpacity="0.5"
-        className="docs-line-2"
+        opacity="0.4"
       />
       <rect
         x="72"
@@ -93,7 +93,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1.25"
         fill="currentColor"
         fillOpacity="0.5"
-        className="docs-line-3"
+        opacity="0.4"
       />
 
       {/* Embedded code block — highlighted area */}
@@ -108,7 +108,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         stroke="currentColor"
         strokeWidth="1"
         strokeOpacity="0.4"
-        className="docs-code-block"
+        opacity="0.5"
       />
       <rect
         x="78"
@@ -118,7 +118,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1"
         fill="currentColor"
         fillOpacity="0.7"
-        className="docs-code-line-1"
+        opacity="0.5"
       />
       <rect
         x="78"
@@ -128,7 +128,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1"
         fill="currentColor"
         fillOpacity="0.7"
-        className="docs-code-line-2"
+        opacity="0.5"
       />
 
       {/* Content lines 4-5 — continuation under code block */}
@@ -140,7 +140,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1.25"
         fill="currentColor"
         fillOpacity="0.5"
-        className="docs-line-4"
+        opacity="0.4"
       />
       <rect
         x="72"
@@ -150,7 +150,7 @@ export function DocsIcon({ className }: DocsIconProps) {
         rx="1.25"
         fill="currentColor"
         fillOpacity="0.5"
-        className="docs-line-5"
+        opacity="0.4"
       />
     </svg>
   );

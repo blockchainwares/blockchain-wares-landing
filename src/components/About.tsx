@@ -1,6 +1,5 @@
 import { cn } from "../lib/utils";
 import { SectionHeader } from "./ui";
-import { useScrollAnimation } from "../hooks";
 
 interface ValueProp {
   title: string;
@@ -27,11 +26,8 @@ const VALUE_PROPS: ValueProp[] = [
 ];
 
 export function About() {
-  const { ref: section_ref, is_visible: section_visible } = useScrollAnimation<HTMLElement>();
-
   return (
     <section
-      ref={section_ref}
       id="about"
       className="relative min-h-screen flex items-center py-12 md:py-24 lg:py-32 px-4"
     >
@@ -45,7 +41,6 @@ export function About() {
               title="Software Development"
               accent="Done Right"
               description="Founded in 2002, we are a software development company based in Dabrowa Gornicza, Poland. Since 2013 we have been deeply involved in blockchain, while continuing to build complete products, complex frameworks, and reusable libraries that power businesses worldwide."
-              isVisible={section_visible}
               align="left"
               className="mb-4 md:mb-6"
               descriptionClassName="text-base-content/70"
@@ -59,10 +54,7 @@ export function About() {
                 key={prop.title}
                 className={cn(
                   "flex items-start gap-4 md:gap-6 py-5 md:py-6",
-                  index < VALUE_PROPS.length - 1 && "border-b border-white/5",
-                  "fade-right",
-                  `stagger-${index + 1}`,
-                  section_visible && "is-visible"
+                  index < VALUE_PROPS.length - 1 && "border-b border-white/5"
                 )}
               >
                 <div>

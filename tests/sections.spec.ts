@@ -36,12 +36,23 @@ test.describe("Sections visibility", () => {
     await expect(expertise_section).toBeVisible({ timeout: 10000 });
 
     await expect(expertise_section.getByText("What We Do")).toBeVisible();
-    // Nieaktywne panele mają aria-hidden, więc rola `tabpanel` wskazuje ten otwarty.
+    // Nieaktywne panele mają `hidden`, więc rola `tabpanel` wskazuje ten otwarty.
     await expect(
       expertise_section
         .getByRole("tabpanel")
         .getByRole("heading", { name: FIRST_TAB_HEADING, exact: true }),
     ).toBeVisible({ timeout: 10000 });
+  });
+
+  // `<noscript>` w `<head>` rozbijał kompilację layoutu: meta og/twitter znikały,
+  // a wyrażenie `{!noindex && ...}` lądowało w body jako tekst.
+  test("meta og/twitter zostają w head strony głównej", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(
+      page.locator('head meta[property="og:description"]'),
+    ).toHaveCount(1);
+    await expect(page.locator('head meta[name="twitter:card"]')).toHaveCount(1);
+    expect(await page.locator("body").textContent()).not.toContain("!noindex");
   });
 
   test("All main sections exist on page", async ({ page }) => {

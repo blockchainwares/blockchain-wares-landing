@@ -106,7 +106,7 @@ function freshness_label(freshness: DataFreshness): string {
 }
 
 const ATTRIBUTION_LINK_CLASS =
-  "rounded-sm underline underline-offset-2 transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "rounded-sm underline underline-offset-2 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 /**
  * CC BY 4.0 wymaga atrybucji na ekranie korzystajacym z danych — tekst i link
@@ -137,14 +137,14 @@ const NOTICE_TONES = {
     text: "text-error",
     meta: "text-error/80",
     action:
-      "rounded-md border border-error/40 bg-error/10 px-3 py-1.5 text-sm font-semibold text-error transition-colors duration-150 hover:bg-error/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error",
+      "rounded-md border border-error/40 bg-error/10 px-3 py-1.5 text-sm font-semibold text-error hover:bg-error/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error",
   },
   warning: {
     wrapper: "border-warning/40 bg-warning/10",
     text: "text-warning",
     meta: "text-warning/80",
     action:
-      "rounded-md border border-warning/40 bg-warning/10 px-3 py-1.5 text-sm font-semibold text-warning transition-colors duration-150 hover:bg-warning/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning",
+      "rounded-md border border-warning/40 bg-warning/10 px-3 py-1.5 text-sm font-semibold text-warning hover:bg-warning/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning",
   },
 } as const;
 

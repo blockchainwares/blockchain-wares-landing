@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { cn } from "../lib/utils";
 import { EventCard } from "./EventCard";
 import {
@@ -8,22 +7,6 @@ import {
   type EventStatus,
   type TradeFairEvent,
 } from "./events-data";
-
-const EASE: [number, number, number, number] = [0.44, 0, 0.56, 1];
-
-const MOTION_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASE, delay: index * 0.08 },
-  }),
-};
-
-const STATIC_VARIANTS: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: { opacity: 1, y: 0 },
-};
 
 // Szkic bez terminu zostaje w panelu: `SECTION_HEADINGS` ma juz dla niego naglowek,
 // ale o wypuszczeniu go na strone publiczna decyduje warstwa prezentacji.
@@ -50,8 +33,6 @@ const SECTION_HEADINGS: Record<
 interface EventSection {
   status: EventStatus;
   events: TradeFairEvent[];
-  /** Stagger position of the section heading in the page-wide entrance sequence */
-  motion_index: number;
 }
 
 interface MarketsProps {
@@ -67,25 +48,14 @@ interface MarketsProps {
  * Splits events into ongoing / upcoming / past against the current day.
  */
 export function Markets({ events, todayIso }: MarketsProps) {
-  const prefers_reduced_motion = useReducedMotion();
   const [now, set_now] = useState(() => parse_iso_day(todayIso));
-  // useReducedMotion() is null on the server, so the preference may only be applied after mount
-  const [is_hydrated, set_is_hydrated] = useState(false);
 
   useEffect(() => {
     set_now(new Date());
-    set_is_hydrated(true);
   }, []);
-
-  const variants =
-    is_hydrated && prefers_reduced_motion ? STATIC_VARIANTS : MOTION_VARIANTS;
 
   const sections = useMemo(() => build_sections(events, now), [events, now]);
   const is_empty = sections.length === 0;
-  // The empty panel takes the stagger slot the first section would have had
-  const outro_index = is_empty
-    ? 2
-    : sections.reduce((total, section) => total + section.events.length + 1, 1);
   const outro = is_empty
     ? {
         lead: "Want to hear when the next dates land? ",
@@ -99,13 +69,7 @@ export function Markets({ events, todayIso }: MarketsProps) {
   return (
     <main className="relative min-h-screen px-4 pt-28 pb-20 md:pt-36 md:pb-28">
       <div className="relative z-10 mx-auto w-full max-w-5xl">
-        <motion.header
-          custom={0}
-          variants={variants}
-          initial="hidden"
-          animate="visible"
-          className="mb-12 md:mb-16"
-        >
+        <header className="mb-12 md:mb-16">
           <span className="mb-2 block text-xs font-medium uppercase tracking-wider text-secondary md:mb-4 md:text-sm">
             Markets
           </span>
@@ -120,14 +84,10 @@ export function Markets({ events, todayIso }: MarketsProps) {
             discuss blockchain infrastructure, engineering tooling or a project
             of your own.
           </p>
-        </motion.header>
+        </header>
 
         {is_empty ? (
-          <motion.p
-            custom={1}
-            variants={variants}
-            initial="hidden"
-            animate="visible"
+          <p
             className={cn(
               "px-6 py-8 md:px-8 md:py-10",
               "rounded-[32px] md:rounded-[40px]",
@@ -139,7 +99,7 @@ export function Markets({ events, todayIso }: MarketsProps) {
           >
             Nothing is on our calendar right now — new dates land here as soon
             as they are booked.
-          </motion.p>
+          </p>
         ) : null}
 
         {sections.map((section) => (
@@ -148,11 +108,7 @@ export function Markets({ events, todayIso }: MarketsProps) {
             aria-labelledby={`${section.status}-events-heading`}
             className="mb-12 last:mb-0 md:mb-16"
           >
-            <motion.h2
-              custom={section.motion_index}
-              variants={variants}
-              initial="hidden"
-              animate="visible"
+            <h2
               id={`${section.status}-events-heading`}
               className="mb-6 text-xl font-bold md:mb-8 md:text-2xl"
             >
@@ -160,50 +116,38 @@ export function Markets({ events, todayIso }: MarketsProps) {
               <span className={SECTION_HEADINGS[section.status].accent_class}>
                 {SECTION_HEADINGS[section.status].accent}
               </span>
-            </motion.h2>
+            </h2>
 
             <ul role="list" className="flex flex-col gap-6 list-none p-0 m-0">
-              {section.events.map((event, index) => (
-                <motion.li
-                  key={event.id}
-                  custom={section.motion_index + index + 1}
-                  variants={variants}
-                  initial="hidden"
-                  animate="visible"
-                >
+              {section.events.map((event) => (
+                <li key={event.id}>
                   <EventCard event={event} status={section.status} />
-                </motion.li>
+                </li>
               ))}
             </ul>
           </section>
         ))}
 
-        <motion.p
-          custom={outro_index}
-          variants={variants}
-          initial="hidden"
-          animate="visible"
-          className="mt-12 text-sm text-base-content/80 md:mt-16 md:text-base"
+        <p className="mt-12 text-sm text-base-content/80 md:mt-16 md:text-base"
         >
           {outro.lead}
           <a
             href="/#contact"
-            className="font-semibold text-secondary underline-offset-4 transition-colors duration-150 hover:text-secondary/80 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-sm"
+            className="font-semibold text-secondary underline-offset-4 hover:text-secondary/80 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-sm"
           >
             Get in touch
           </a>
           {outro.tail}
-        </motion.p>
+        </p>
       </div>
     </main>
   );
 }
 
-/** Non-empty status sections in display order, each with its stagger offset */
+/** Non-empty status sections in display order */
 function build_sections(events: TradeFairEvent[], now: Date): EventSection[] {
   const groups = group_events_by_status(now, events);
   const sections: EventSection[] = [];
-  let motion_index = 1;
 
   for (const status of SECTION_ORDER) {
     const status_events = groups[status];
@@ -212,8 +156,7 @@ function build_sections(events: TradeFairEvent[], now: Date): EventSection[] {
       continue;
     }
 
-    sections.push({ status, events: status_events, motion_index });
-    motion_index += status_events.length + 1;
+    sections.push({ status, events: status_events });
   }
 
   return sections;

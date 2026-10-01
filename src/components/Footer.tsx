@@ -24,7 +24,7 @@ export function Footer({ currentPath = "/" }: FooterProps) {
           <div className="flex items-center gap-3">
             <a
               href={is_home ? "#" : "/"}
-              className="text-base font-bold text-base-content hover:text-secondary transition-colors duration-150"
+              className="text-base font-bold text-base-content hover:text-secondary"
             >
               BlockchainWares
             </a>
@@ -34,7 +34,7 @@ export function Footer({ currentPath = "/" }: FooterProps) {
             <a
               href={MARKETS_PATH}
               aria-current={is_markets ? "page" : undefined}
-              className="text-xs font-medium text-secondary/90 hover:text-secondary transition-colors duration-150"
+              className="text-xs font-medium text-secondary/90 hover:text-secondary"
             >
               Markets
             </a>
@@ -52,7 +52,7 @@ export function Footer({ currentPath = "/" }: FooterProps) {
             </p>
             <a
               href="#"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-base-content/70 hover:text-secondary transition-colors duration-150"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-base-content/70 hover:text-secondary"
             >
               <ArrowUpIcon />
               <span>Back to top</span>

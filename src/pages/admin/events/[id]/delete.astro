@@ -44,10 +44,10 @@ const KIND_LABEL = {
 } as const;
 
 const DANGER_BUTTON_CLASS =
-  "inline-flex items-center rounded-md border border-error/50 bg-error/15 px-4 py-2 text-sm font-semibold text-error transition-colors duration-150 hover:border-error/70 hover:bg-error/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error";
+  "inline-flex items-center rounded-md border border-error/50 bg-error/15 px-4 py-2 text-sm font-semibold text-error hover:border-error/70 hover:bg-error/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error";
 
 const LINK_CLASS =
-  "admin-mono rounded-sm break-all underline underline-offset-2 transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "admin-mono rounded-sm break-all underline underline-offset-2 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 interface ProblemView {
   /** Naglowek nad komunikatem z `admin_actions`: sam werdykt, nie tresc. */
@@ -242,7 +242,7 @@ const back_label = show_delete
     <header>
       <a
         href={ADMIN_EVENTS_PATH}
-        class="rounded-sm text-xs font-medium tracking-wide text-base-content/60 uppercase transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+        class="rounded-sm text-xs font-medium tracking-wide text-base-content/60 uppercase hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
       >
         ← Wydarzenia
       </a>

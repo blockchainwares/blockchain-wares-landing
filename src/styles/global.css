@@ -124,11 +124,6 @@
   }
 }
 
-/* Base styles */
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   font-family: "Quicksand", system-ui, -apple-system, sans-serif;
   line-height: 1.6;
@@ -204,117 +199,6 @@ body {
   }
 }
 
-/* (Legacy About section SVG animations removed — icons simplified) */
-
-/* Hero section animations */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s cubic-bezier(0.6, -0.05, 0.01, 0.99) 0.4s both;
-}
-
-/* Placed mid-file on purpose: Tailwind 4 inlines it here, so the icon pause rules
-   follow the keyframes above and precede reveal/reduced-motion — moving it up changes the cascade */
-@import "./icon_animations.css";
-
-/* ============================================
-   SCROLL-TRIGGERED ANIMATIONS
-   ============================================ */
-
-/* Fade / scale entrance animations — shared base with per-direction custom properties.
-   --_scroll-transform: initial offset (direction-specific)
-   --_scroll-duration: transition timing (default 0.7s, scale-in uses 0.6s)
-   Unlayered, so this list overrides Tailwind `transition-*` utilities on the same element:
-   hover properties ride along at the utility's `--tw-duration`, stagger delays only the reveal. */
-.fade-up,
-.fade-down,
-.fade-left,
-.fade-right,
-.scale-in {
-  opacity: 0;
-  transform: var(--_scroll-transform);
-  transition-property: opacity, transform, color, background-color, border-color, box-shadow;
-  transition-duration: var(--_scroll-duration, 0.7s), var(--_scroll-duration, 0.7s), var(--tw-duration, 150ms), var(--tw-duration, 150ms), var(--tw-duration, 150ms), var(--tw-duration, 150ms);
-  transition-timing-function: ease-out;
-  transition-delay: var(--_scroll-delay, 0s), var(--_scroll-delay, 0s), 0s, 0s, 0s, 0s;
-}
-
-.fade-up    { --_scroll-transform: translateY(30px); }
-.fade-down  { --_scroll-transform: translateY(-30px); }
-.fade-left  { --_scroll-transform: translateX(-30px); }
-.fade-right { --_scroll-transform: translateX(30px); }
-.scale-in   { --_scroll-transform: scale(0.95); --_scroll-duration: 0.6s; }
-
-:is(.fade-up, .fade-down, .fade-left, .fade-right, .scale-in).is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Stagger delays for children */
-.stagger-1 { --_scroll-delay: 0.1s; }
-.stagger-2 { --_scroll-delay: 0.2s; }
-.stagger-3 { --_scroll-delay: 0.3s; }
-.stagger-4 { --_scroll-delay: 0.4s; }
-.stagger-5 { --_scroll-delay: 0.5s; }
-.stagger-6 { --_scroll-delay: 0.6s; }
-
-/* Hero specific animations - always visible, just animated on load */
-.hero-fade-in {
-  animation: hero-fade 0.8s ease-out forwards;
-}
-
-.hero-fade-in-delayed {
-  animation: hero-fade 0.8s ease-out 0.3s forwards;
-  opacity: 0;
-}
-
-@keyframes hero-fade {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 3 cycles, then stop: an endless float cost ~20 pts of CPU in Firefox. `backwards` holds 0.7
-   through the stagger delay; the settle has no fill on purpose (ends on the base opacity 1) */
-.logo-cube {
-  animation:
-    float-cube 2.5s ease-in-out var(--cube-delay, 0s) 3 backwards,
-    settle-cube 0.4s ease-out calc(var(--cube-delay, 0s) + 7.5s);
-}
-
-/* 800% / 381 = 8 user units of the 381-unit-tall viewBox */
-
-@keyframes float-cube {
-  0%, 100% {
-    transform: translate3d(0, 0, 0);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translate3d(0, calc(-800% / 381), 0);
-    opacity: 1;
-  }
-}
-
-@keyframes settle-cube {
-  from {
-    opacity: 0.7;
-  }
-}
-
 /* Our Works — inline scrollbar (thin, subtle) */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
@@ -340,103 +224,13 @@ body {
   scrollbar-color: oklch(44% 0.043 257.281 / 0.5) transparent;
 }
 
-/* Our Works — auto-rotate progress bar */
-@keyframes progress-fill {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-/* ============================================
-   SPLASH SCREEN ANIMATIONS
-   ============================================ */
-
-/* Cube assembly — top cube enters from above */
-@keyframes splash-cube-top {
-  from {
-    transform: translateY(-150px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Cube assembly — bottom-left enters from lower-left */
-@keyframes splash-cube-bottom-left {
-  from {
-    transform: translate(-150px, 100px);
-    opacity: 0;
-  }
-  to {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
-}
-
-/* Cube assembly — bottom-right enters from lower-right */
-@keyframes splash-cube-bottom-right {
-  from {
-    transform: translate(150px, 100px);
-    opacity: 0;
-  }
-  to {
-    transform: translate(0, 0);
-    opacity: 1;
-  }
-}
-
-/* Typewriter letter reveal */
-@keyframes splash-letter {
-  from {
-    max-width: 0;
-    opacity: 0;
-  }
-  to {
-    max-width: 1.5em;
-    opacity: 1;
-  }
-}
-
-/* Blinking cursor */
-@keyframes splash-blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    /* Zeroed delays too: `fill-mode: both` would otherwise hold the hidden state
-       for the whole delay, leaving the page blank for half a second */
-    animation-delay: 0s !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
-  }
-
-  .fade-up,
-  .fade-down,
-  .fade-left,
-  .fade-right,
-  .scale-in {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  #splash-screen {
-    display: none !important;
-  }
-
-  .logo-cube {
-    animation: none;
-  }
-
+/* Zero motion site-wide (owner decision after Firefox + Windows perf issues).
+   !important beats every normal declaration, inline styles included. A layered
+   !important (a Tailwind `!` utility) would still win, but DaisyUI 5 ships none. */
+*,
+*::before,
+*::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
 }

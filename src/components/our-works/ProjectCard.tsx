@@ -1,25 +1,7 @@
 import { memo, type ReactNode } from "react";
-import { motion } from "framer-motion";
 import type { Deployment, Project } from "../our-works-data";
 
-interface ProjectCardProps extends Project {
-  index: number;
-}
-
-const EASE: [number, number, number, number] = [0.44, 0, 0.56, 1];
-
-const CARD_VARIANTS = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: EASE,
-      delay: index * 0.05,
-    },
-  }),
-};
+type ProjectCardProps = Project;
 
 function getDeploymentDisplay(deployment: Deployment): string {
   if (deployment.label) return deployment.label;
@@ -107,14 +89,9 @@ export const ProjectCard = memo(function ProjectCard({
   title,
   description,
   deployments,
-  index,
 }: ProjectCardProps) {
   return (
-    <motion.article
-      custom={index}
-      variants={CARD_VARIANTS}
-      initial="hidden"
-      animate="visible"
+    <article
       className="flex flex-col gap-1 md:flex-row md:gap-6 py-4"
     >
       <div className="shrink-0 md:w-72">
@@ -131,17 +108,17 @@ export const ProjectCard = memo(function ProjectCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Visit ${title} — ${label}`}
-                  className="group flex items-center gap-2.5 text-[13px] text-secondary/75 no-underline py-[3px] hover:text-secondary hover:translate-x-0.5 transition-[color,transform] duration-150 min-w-0"
+                  className="group flex items-center gap-2.5 text-[13px] text-secondary/75 no-underline py-[3px] hover:text-secondary min-w-0"
                 >
                   <span className="shrink-0 text-secondary" aria-hidden="true">
                     {getLinkIcon(label)}
                   </span>
                   <span className="font-semibold min-w-[60px]">{label}</span>
-                  <span className="font-mono text-xs text-base-content/40 group-hover:text-secondary/60 transition-colors duration-150 truncate">
+                  <span className="font-mono text-xs text-base-content/40 group-hover:text-secondary/60 truncate">
                     {getPrettyUrl(deployment.url)}
                   </span>
                   <span
-                    className="ml-auto shrink-0 text-base-content/30 group-hover:text-secondary transition-colors duration-150"
+                    className="ml-auto shrink-0 text-base-content/30 group-hover:text-secondary"
                     aria-hidden="true"
                   >
                     <svg
@@ -171,6 +148,6 @@ export const ProjectCard = memo(function ProjectCard({
           {description}
         </p>
       </div>
-    </motion.article>
+    </article>
   );
 });

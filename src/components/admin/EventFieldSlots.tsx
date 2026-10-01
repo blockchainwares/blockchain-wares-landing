@@ -389,7 +389,7 @@ function SlotItem({ group, index, row, codes, hintId }: SlotItemProps) {
       <li
         data-slot-index={index}
         className={cn(
-          "flex min-w-0 basis-full items-center gap-1.5 rounded-full border py-1 pr-1 pl-3 transition-colors duration-150 motion-reduce:transition-none sm:basis-[calc(50%-0.25rem)]",
+          "flex min-w-0 basis-full items-center gap-1.5 rounded-full border py-1 pr-1 pl-3 sm:basis-[calc(50%-0.25rem)]",
           invalid
             ? SLOT_ERROR_CLASS
             : filled

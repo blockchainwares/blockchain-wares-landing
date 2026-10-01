@@ -36,7 +36,7 @@ const KIND_LABEL = {
 } as const;
 
 const DANGER_BUTTON_CLASS =
-  "inline-flex items-center rounded-md border border-error/40 bg-error/10 px-3 py-1.5 text-sm font-medium text-error transition-colors duration-150 hover:border-error/70 hover:bg-error/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error";
+  "inline-flex items-center rounded-md border border-error/40 bg-error/10 px-3 py-1.5 text-sm font-medium text-error hover:border-error/70 hover:bg-error/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error";
 
 const CELL_CLASS = "border-b border-base-300/60 px-3 py-3 align-top";
 

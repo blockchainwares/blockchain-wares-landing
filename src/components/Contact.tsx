@@ -1,6 +1,5 @@
 import { cn } from "../lib/utils";
 import { SectionHeader, SectionWrapper } from "./ui";
-import { useScrollAnimation } from "../hooks";
 
 interface ContactInfo {
   label: string;
@@ -39,11 +38,8 @@ const CONTACT_DATA: ContactInfo[] = [
  * - Google Maps embed
  */
 export function Contact() {
-  const { ref, is_visible } = useScrollAnimation<HTMLElement>();
-
   return (
     <section
-      ref={ref}
       id="contact"
       className="relative min-h-screen flex items-center py-16 md:py-24 lg:py-32 px-4"
     >
@@ -53,7 +49,6 @@ export function Contact() {
           title="Get In"
           accent="Touch"
           description="Have a project in mind? We'd love to hear from you."
-          isVisible={is_visible}
           className="mb-12 md:mb-16"
         />
 
@@ -64,10 +59,7 @@ export function Contact() {
               "bg-base-200/30 backdrop-blur-sm",
               "border border-white/5",
               "shadow-card",
-              "transition-shadow duration-300",
-              "hover:shadow-card-hover",
-              "fade-left stagger-3",
-              is_visible && "is-visible"
+              "hover:shadow-card-hover"
             )}
           >
             <h3 className="text-xl md:text-2xl font-bold mb-3">
@@ -90,10 +82,7 @@ export function Contact() {
               "bg-base-200/30 backdrop-blur-sm",
               "border border-white/5",
               "shadow-card",
-              "transition-shadow duration-300",
-              "hover:shadow-card-hover",
-              "fade-right stagger-4",
-              is_visible && "is-visible"
+              "hover:shadow-card-hover"
             )}
           >
             <div className="h-[350px] rounded-xl overflow-hidden bg-base-100/50 relative z-10">
@@ -145,7 +134,6 @@ function ContactItem({ label, value, link, icon }: ContactInfo) {
         "flex items-center gap-4 p-3 rounded-xl",
         "bg-base-100/30 border border-white/5",
         "shadow-sm",
-        "transition-shadow duration-300",
         link && "hover:shadow-card-hover cursor-pointer"
       )}
     >

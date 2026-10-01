@@ -59,7 +59,7 @@ const CTA_PRIMARY_CLASS: Record<EventStatus, string> = {
 };
 
 const CTA_BASE =
-  "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-semibold shadow-md transition-[background-color,box-shadow] duration-150 hover:shadow-lg";
+  "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-semibold shadow-md hover:shadow-lg";
 
 const LABEL_CLASS = "text-[11px] font-semibold uppercase tracking-wider";
 const VALUE_CLASS = "text-sm font-medium text-base-content md:text-base";
@@ -67,12 +67,12 @@ const VALUE_CLASS = "text-sm font-medium text-base-content md:text-base";
 const PENDING_NOTE_CLASS =
   "rounded-[32px] border border-white/5 bg-base-200/30 px-6 py-8 text-base leading-relaxed text-base-content/80 shadow-card backdrop-blur-sm md:rounded-[40px] md:px-8 md:py-10 md:text-lg";
 const BACK_LINK_CLASS =
-  "inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-secondary transition-colors duration-150 hover:text-secondary/80";
+  "inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-secondary hover:text-secondary/80";
 
 /**
  * Single event page — facts panel and one dominant call to action.
- * Server-rendered only: no hydration, so the entrance runs on CSS keyframes
- * and the whole page stays readable with JavaScript disabled.
+ * Server-rendered only: no hydration, so the whole page stays readable
+ * with JavaScript disabled.
  */
 export function EventDetail({
   event,
@@ -100,7 +100,7 @@ export function EventDetail({
   return (
     <Container className="relative min-h-screen px-4 pt-28 pb-20 md:pt-36 md:pb-28">
       <div className="mx-auto w-full max-w-5xl">
-        <header className="mb-10 animate-fade-in-up md:mb-14">
+        <header className="mb-10 md:mb-14">
           <a href={MARKETS_PATH} className={cn(BACK_LINK_CLASS, "-my-2 py-2")}>
             <span aria-hidden="true">←</span>
             Markets
@@ -163,16 +163,12 @@ export function EventDetail({
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-12">
           <aside
             aria-labelledby="event-details-heading"
-            className="animate-fade-in-up lg:col-start-2 lg:row-start-1"
-            style={{ animationDelay: "0.48s" }}
+            className="lg:col-start-2 lg:row-start-1"
           >
             <FactsPanel event={event} status={status} theme={theme} />
           </aside>
 
-          <div
-            className="animate-fade-in-up lg:col-start-1 lg:row-start-1"
-            style={{ animationDelay: "0.56s" }}
-          >
+          <div className="lg:col-start-1 lg:row-start-1">
             {event.description ? (
               <section aria-labelledby="event-about-heading">
                 <h2
@@ -222,7 +218,7 @@ export function EventDetail({
               Want to talk before the doors open?{" "}
               <a
                 href={CONTACT_PATH}
-                className="rounded-sm font-semibold text-secondary underline-offset-4 transition-colors duration-150 hover:text-secondary/80 hover:underline"
+                className="rounded-sm font-semibold text-secondary underline-offset-4 hover:text-secondary/80 hover:underline"
               >
                 Get in touch
               </a>{" "}
@@ -357,7 +353,7 @@ function FactsPanel({
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "font-semibold underline-offset-4 transition-colors duration-150 hover:underline",
+                      "font-semibold underline-offset-4 hover:underline",
                       theme.link,
                     )}
                   >
@@ -404,12 +400,7 @@ function FactsPanel({
             : {})}
         >
           {primary.label}
-          <span
-            className="transition-transform duration-150 ease-out group-hover:translate-x-1"
-            aria-hidden="true"
-          >
-            →
-          </span>
+          <span aria-hidden="true">→</span>
           {primary.external ? (
             <span className="sr-only">{primary.sr_label}</span>
           ) : null}
@@ -422,7 +413,6 @@ function FactsPanel({
             rel="noopener noreferrer"
             className={cn(
               "mt-4 inline-flex w-fit items-center gap-2 rounded-sm text-sm font-semibold",
-              "transition-[color,transform] duration-150 hover:translate-x-0.5",
               theme.link,
             )}
           >
