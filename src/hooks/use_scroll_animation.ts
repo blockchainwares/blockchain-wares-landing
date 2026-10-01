@@ -29,7 +29,8 @@ export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        // The first callback reports any overlap as intersecting, whatever the threshold
+        if (entry.isIntersecting && entry.intersectionRatio >= threshold) {
           set_is_visible(true);
           if (triggerOnce) {
             observer.disconnect();
@@ -44,9 +45,7 @@ export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
     observer.observe(element);
 
     // Check if element is already in view on mount (fixes Astro client:visible issue)
-    const rect = element.getBoundingClientRect();
-    const is_in_viewport = rect.top < window.innerHeight && rect.bottom > 0;
-    if (is_in_viewport) {
+    if (get_visible_ratio(element) >= threshold) {
       set_is_visible(true);
       if (triggerOnce) {
         observer.disconnect();
@@ -69,4 +68,17 @@ export function useAnimateOnScroll<T extends HTMLElement = HTMLDivElement>(
   const { ref, is_visible } = useScrollAnimation<T>(options);
   const class_name = `${animation_class}${is_visible ? " is-visible" : ""}`;
   return { ref, class_name, is_visible };
+}
+
+/** Share of the element's height inside the viewport, compared against `threshold` like IO does */
+function get_visible_ratio(element: HTMLElement): number {
+  const rect = element.getBoundingClientRect();
+  const visible_height =
+    Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+  if (visible_height <= 0) {
+    return 0;
+  }
+
+  return rect.height === 0 ? 1 : visible_height / rect.height;
 }

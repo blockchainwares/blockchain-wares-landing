@@ -267,6 +267,54 @@ body {
 .stagger-5 { --_scroll-delay: 0.5s; }
 .stagger-6 { --_scroll-delay: 0.6s; }
 
+/* One-shot entrance (Markets list, project cards), same curve the motion library used.
+   `--i` is the stagger slot, set inline per element; transform/opacity only */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise-in var(--rise-duration, 0.5s) cubic-bezier(0.44, 0, 0.56, 1)
+    calc(var(--i, 0) * var(--rise-step, 80ms)) both;
+}
+
+.rise-in-card {
+  --rise-duration: 0.4s;
+  --rise-step: 50ms;
+}
+
+/* Event banner: fades in once it scrolls into view (`.is-visible` from useScrollAnimation) */
+.banner-reveal {
+  transition:
+    opacity 0.5s cubic-bezier(0.44, 0, 0.56, 1),
+    transform 0.5s cubic-bezier(0.44, 0, 0.56, 1);
+}
+
+/* Start states hide only while scripts run: without JS nothing would ever reveal them */
+@media (scripting: enabled) {
+  .rise-in-pending {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .banner-reveal {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.banner-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
 /* Hero specific animations - always visible, just animated on load */
 .hero-fade-in {
   animation: hero-fade 0.8s ease-out forwards;
@@ -427,6 +475,16 @@ body {
   .fade-left,
   .fade-right,
   .scale-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .rise-in {
+    animation: none;
+  }
+
+  .rise-in-pending,
+  .banner-reveal {
     opacity: 1 !important;
     transform: none !important;
   }

@@ -1,5 +1,11 @@
-import { Fragment, useEffect, useState, type ReactElement } from "react";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import {
+  Fragment,
+  useEffect,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from "react";
+import { useScrollAnimation } from "../hooks/use_scroll_animation";
 import { cn } from "../lib/utils";
 import {
   format_event_date,
@@ -19,23 +25,10 @@ import { get_event_hours, STATUS_THEME } from "./event-theme";
 import { EventBadges } from "./EventBadges";
 import { EventHours } from "./EventHours";
 
-const EASE: [number, number, number, number] = [0.44, 0, 0.56, 1];
-
 const PROMOTED_LIMIT = 2;
 
-const MOTION_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASE },
-  },
-};
-
-const STATIC_VARIANTS: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: { opacity: 1, y: 0 },
-};
+/** Share of the strip that has to be on screen before it reveals */
+const REVEAL_THRESHOLD = 0.4;
 
 interface BannerAccent {
   /** Text tone kept at full opacity for WCAG AA on small text */
@@ -93,14 +86,10 @@ interface EventBannerProps {
  * Renders nothing when nothing is worth promoting — an empty list included.
  */
 export function EventBanner({ events, todayIso }: EventBannerProps) {
-  const prefers_reduced_motion = useReducedMotion();
   const [now, set_now] = useState(() => parse_iso_day(todayIso));
-  // useReducedMotion() is null on the server, so the preference may only be applied after mount
-  const [is_hydrated, set_is_hydrated] = useState(false);
 
   useEffect(() => {
     set_now(new Date());
-    set_is_hydrated(true);
   }, []);
 
   const promoted = get_promoted_events(now, PROMOTED_LIMIT, events);
@@ -109,8 +98,6 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
     return null;
   }
 
-  const variants =
-    is_hydrated && prefers_reduced_motion ? STATIC_VARIANTS : MOTION_VARIANTS;
   const has_ongoing = promoted.some(
     (event) => get_event_status(event, now) === "ongoing",
   );
@@ -118,14 +105,7 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
   const is_single = promoted.length === 1;
 
   return (
-    <motion.aside
-      variants={variants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.4 }}
-      aria-label="Where to meet us"
-      className="relative px-4 py-8 md:py-12"
-    >
+    <BannerReveal>
       <div
         className={cn(
           "mx-auto flex w-full max-w-6xl flex-col gap-4",
@@ -170,7 +150,31 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
           <ArrowRightIcon />
         </a>
       </div>
-    </motion.aside>
+    </BannerReveal>
+  );
+}
+
+/**
+ * Landmark that fades in once it scrolls into view. A child of the banner on purpose:
+ * it mounts only once there is something to promote, so the observer always gets a node
+ * — even when the visitor's day turns the list non-empty only after mount.
+ */
+function BannerReveal({ children }: { children: ReactNode }) {
+  const { ref, is_visible } = useScrollAnimation<HTMLElement>({
+    threshold: REVEAL_THRESHOLD,
+  });
+
+  return (
+    <aside
+      ref={ref}
+      aria-label="Where to meet us"
+      className={cn(
+        "banner-reveal relative px-4 py-8 md:py-12",
+        is_visible && "is-visible",
+      )}
+    >
+      {children}
+    </aside>
   );
 }
 

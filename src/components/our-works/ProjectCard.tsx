@@ -1,25 +1,45 @@
-import { memo, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import {
+  memo,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import { cn } from "../../lib/utils";
 import type { Deployment, Project } from "../our-works-data";
 
 interface ProjectCardProps extends Project {
   index: number;
 }
 
-const EASE: [number, number, number, number] = [0.44, 0, 0.56, 1];
+/** Mirrors `.rise-in-card` in global.css: 400ms run plus a 50ms step per card */
+const RISE_DURATION_MS = 400;
+const RISE_STEP_MS = 50;
+/** Frame of slack: the timer starts before the browser first styles the animation */
+const RISE_SLACK_MS = 100;
 
-const CARD_VARIANTS = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: EASE,
-      delay: index * 0.05,
-    },
-  }),
-};
+type RisePhase = "pending" | "rising" | "done";
+
+/**
+ * Entrance runs once, when the island mounts. The class is dropped afterwards: on mobile
+ * inactive tabs are `display: none`, and a CSS animation still attached would replay on every
+ * tab switch.
+ */
+function use_rise_phase(index: number): RisePhase {
+  const [phase, set_phase] = useState<RisePhase>("pending");
+
+  useEffect(() => {
+    set_phase("rising");
+    const timer = window.setTimeout(
+      () => set_phase("done"),
+      RISE_DURATION_MS + index * RISE_STEP_MS + RISE_SLACK_MS,
+    );
+
+    return () => window.clearTimeout(timer);
+  }, [index]);
+
+  return phase;
+}
 
 function getDeploymentDisplay(deployment: Deployment): string {
   if (deployment.label) return deployment.label;
@@ -109,13 +129,16 @@ export const ProjectCard = memo(function ProjectCard({
   deployments,
   index,
 }: ProjectCardProps) {
+  const phase = use_rise_phase(index);
+
   return (
-    <motion.article
-      custom={index}
-      variants={CARD_VARIANTS}
-      initial="hidden"
-      animate="visible"
-      className="flex flex-col gap-1 md:flex-row md:gap-6 py-4"
+    <article
+      style={{ "--i": index } as CSSProperties}
+      className={cn(
+        "flex flex-col gap-1 md:flex-row md:gap-6 py-4",
+        phase === "pending" && "rise-in-pending",
+        phase === "rising" && "rise-in rise-in-card",
+      )}
     >
       <div className="shrink-0 md:w-72">
         <h4 className="text-base font-bold">{title}</h4>
@@ -144,12 +167,7 @@ export const ProjectCard = memo(function ProjectCard({
                     className="ml-auto shrink-0 text-base-content/30 group-hover:text-secondary transition-colors duration-150"
                     aria-hidden="true"
                   >
-                    <svg
-                      viewBox="0 0 10 10"
-                      fill="none"
-                      width="10"
-                      height="10"
-                    >
+                    <svg viewBox="0 0 10 10" fill="none" width="10" height="10">
                       <path
                         d="M2 8L8 2M8 2H3.5M8 2V6.5"
                         stroke="currentColor"
@@ -171,6 +189,6 @@ export const ProjectCard = memo(function ProjectCard({
           {description}
         </p>
       </div>
-    </motion.article>
+    </article>
   );
 });

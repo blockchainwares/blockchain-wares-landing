@@ -50,8 +50,8 @@ const PAGE_WITHOUT_HERO = "/markets";
  * Klatka zaczyna się od `clearRect` na płótnie podpiętym do DOM — sprite'y pętli
  * rysowane są na płótnach odłączonych, więc się nie liczą. Zapis `width`/`height`
  * na podpiętym płótnie to realokacja bitmapy. `raf_calls` liczy tylko żądania
- * klatek ze stosu modułu `blockchain-grid` — framer-motion i nawigacja też używają
- * rAF, a ich wywołania nie mówią nic o pętli tła.
+ * klatek ze stosu modułu `blockchain-grid` — nawigacja też używa rAF, a jej
+ * wywołania nie mówią nic o pętli tła.
  */
 function install_probe(): void {
   const probe: HeroProbe = { frames: 0, size_writes: 0, raf_calls: 0 };
