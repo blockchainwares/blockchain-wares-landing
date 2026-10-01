@@ -2,6 +2,10 @@ interface EdaIconProps {
   className?: string;
 }
 
+function pin_delay(seconds: number): string {
+  return `${seconds.toFixed(2)}s`;
+}
+
 export function EdaIcon({ className }: EdaIconProps) {
   return (
     <svg
@@ -65,10 +69,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy={y}
             r="3"
             fill="currentColor"
-            fillOpacity="0.6"
-            style={{
-              animation: `eda-pin-blink 1.5s ease-in-out ${i * 0.15}s infinite`
-            }}
+            className="eda-pin"
+            style={{ animationDelay: pin_delay(i * 0.15) }}
           />
         </g>
       ))}
@@ -89,10 +91,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy={y}
             r="3"
             fill="currentColor"
-            fillOpacity="0.6"
-            style={{
-              animation: `eda-pin-blink 1.5s ease-in-out ${0.9 - i * 0.15}s infinite`
-            }}
+            className="eda-pin"
+            style={{ animationDelay: pin_delay(0.9 - i * 0.15) }}
           />
         </g>
       ))}
@@ -113,10 +113,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy="30"
             r="3"
             fill="currentColor"
-            fillOpacity="0.6"
-            style={{
-              animation: `eda-pin-blink 1.2s ease-in-out ${i * 0.2}s infinite`
-            }}
+            className="eda-pin eda-pin-fast"
+            style={{ animationDelay: pin_delay(i * 0.2) }}
           />
         </g>
       ))}
@@ -137,10 +135,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy="130"
             r="3"
             fill="currentColor"
-            fillOpacity="0.6"
-            style={{
-              animation: `eda-pin-blink 1.2s ease-in-out ${0.6 - i * 0.2}s infinite`
-            }}
+            className="eda-pin eda-pin-fast"
+            style={{ animationDelay: pin_delay(0.6 - i * 0.2) }}
           />
         </g>
       ))}
