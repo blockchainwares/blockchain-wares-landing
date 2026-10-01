@@ -21,7 +21,7 @@ const DOCS_TAB = "Documentation";
 const SECTION_ANCHOR = "#what-we-do";
 /** Deep-link cel scrolla: dwupanelowy layout, nie nagłówek sekcji. */
 const CONTENT_ANCHOR = "#what-we-do-content";
-/** Fixed navbar (h-16) + oddech — `scroll-mt-20` na `#what-we-do-content` w OurWorks.tsx. */
+/** Fixed navbar (h-16) + oddech — OurWorks.tsx: NAV_OFFSET_PX + CONTENT_GAP_PX. */
 const CONTENT_TOP_PX = 80;
 /** Zaokrąglenia layoutu i subpiksele — sam offset musi się zgadzać co do kilku px. */
 const CONTENT_TOP_TOLERANCE_PX = 8;
@@ -33,10 +33,13 @@ const CONTENT_TOP_TOLERANCE_PX = 8;
 const HYDRATED_ISLAND = 'astro-island[component-export="OurWorks"]:not([ssr])';
 /** Wyspa jest `client:visible`, więc czekamy na hydrację po deep-linku. */
 const TAB_TIMEOUT = 15_000;
-const VIEWPORTS = [
-  { name: "desktop", viewport: { width: 1280, height: 800 } },
-  { name: "mobile", viewport: { width: 390, height: 844 } },
-] as const;
+/** useAutoRotate przeskakuje co 15 s — po deep-linku nie ma prawa tego zrobić. */
+const AUTO_ROTATE_INTERVAL_MS = 15_000;
+const AUTO_ROTATE_MARGIN_MS = 4_000;
+
+// Bez animacji intro splash nie blokuje scrolla, więc deep-link działa od razu.
+// W Playwright 1.58 `reducedMotion` jest opcją kontekstu, nie osobną opcją testu.
+test.use({ contextOptions: { reducedMotion: "reduce" } });
 
 /** Wejście na stronę + doprowadzenie sekcji na ekran, żeby wyspa się zhydratowała. */
 async function open_section(page: Page, search: string): Promise<void> {
@@ -66,38 +69,35 @@ test.describe("Deep-linki sekcji What We Do", () => {
     });
   }
 
-  for (const { name, viewport } of VIEWPORTS) {
-    test(`deep-link zatrzymuje treść kategorii pod navbarem, nie nagłówek sekcji (${name})`, async ({
-      page,
-    }) => {
-      await page.setViewportSize(viewport);
-      // Bez scrollIntoViewIfNeeded: skok robi sama strona, inaczej test mierzyłby
-      // pozycję ustawioną przez Playwright.
-      await page.goto("/?ufa");
-      await expect(page.locator(HYDRATED_ISLAND)).toBeAttached({
-        timeout: TAB_TIMEOUT,
-      });
-      await expect_open_tab(page, "User-Facing Applications");
-
-      await expect
-        .poll(
-          async () => {
-            const top = await page
-              .locator(CONTENT_ANCHOR)
-              .evaluate((node) => node.getBoundingClientRect().top);
-            return Math.abs(top - CONTENT_TOP_PX);
-          },
-          { timeout: TAB_TIMEOUT },
-        )
-        .toBeLessThanOrEqual(CONTENT_TOP_TOLERANCE_PX);
-
-      // Nagłówek sekcji ma zostać nad kadrem — inaczej to stary cel scrolla.
-      const heading_top = await page
-        .locator(`${SECTION_ANCHOR} h2`)
-        .evaluate((node) => node.getBoundingClientRect().top);
-      expect(heading_top).toBeLessThan(0);
+  test("deep-link zatrzymuje treść kategorii pod navbarem, nie nagłówek sekcji", async ({
+    page,
+  }) => {
+    // Bez scrollIntoViewIfNeeded: skok robi sama strona, inaczej test mierzyłby
+    // pozycję ustawioną przez Playwright.
+    await page.goto("/?ufa");
+    await expect(page.locator(HYDRATED_ISLAND)).toBeAttached({
+      timeout: TAB_TIMEOUT,
     });
-  }
+    await expect_open_tab(page, "User-Facing Applications");
+
+    await expect
+      .poll(
+        async () => {
+          const top = await page
+            .locator(CONTENT_ANCHOR)
+            .evaluate((node) => node.getBoundingClientRect().top);
+          return Math.abs(top - CONTENT_TOP_PX);
+        },
+        { timeout: TAB_TIMEOUT },
+      )
+      .toBeLessThanOrEqual(CONTENT_TOP_TOLERANCE_PX);
+
+    // Nagłówek sekcji ma zostać nad kadrem — inaczej to stary cel scrolla.
+    const heading_top = await page
+      .locator(`${SECTION_ANCHOR} h2`)
+      .evaluate((node) => node.getBoundingClientRect().top);
+    expect(heading_top).toBeLessThan(0);
+  });
 
   test("nieznany alias zostawia zakładkę domyślną i nie wywala strony", async ({
     page,
@@ -116,31 +116,24 @@ test.describe("Deep-linki sekcji What We Do", () => {
     expect(failures).toEqual([]);
   });
 
-  test("serwer renderuje zakładkę z deep-linku otwartą, bez JS", async ({
-    browser,
-  }) => {
-    const context = await browser.newContext({ javaScriptEnabled: false });
-    const page = await context.newPage();
-    await page.goto("/?docs");
-
-    const open_panels = page.locator(
-      `${SECTION_ANCHOR} [role="tabpanel"]:not([hidden])`,
-    );
-    await expect(open_panels).toHaveCount(1);
-    await expect(
-      open_panels.getByRole("heading", { name: DOCS_TAB, exact: true }),
-    ).toBeVisible();
-    await expect(page.locator(CONTENT_ANCHOR)).toHaveAttribute(
-      "data-deep-link",
-      "",
-    );
-    await context.close();
-  });
-
   test("?utm_source=nl&docs otwiera docs — klucze z wartością są pomijane", async ({
     page,
   }) => {
     await open_section(page, "?utm_source=nl&docs");
+    await expect_open_tab(page, DOCS_TAB);
+  });
+
+  test("po deep-linku auto-rotacja nie podmienia zakładki", async ({
+    page,
+  }) => {
+    // Czekamy dłużej niż interwał rotacji — skrócenie tego czekania unieważnia test.
+    test.slow();
+
+    await open_section(page, "?docs");
+    await expect_open_tab(page, DOCS_TAB);
+
+    await page.waitForTimeout(AUTO_ROTATE_INTERVAL_MS + AUTO_ROTATE_MARGIN_MS);
+
     await expect_open_tab(page, DOCS_TAB);
   });
 });

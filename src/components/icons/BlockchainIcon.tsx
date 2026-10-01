@@ -24,7 +24,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Central hexagon - main node */}
-      <g>
+      <g className="blockchain-center">
         <path
           d={HEX_CENTER_28}
           fill="currentColor"
@@ -43,7 +43,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Top hexagon */}
-      <g>
+      <g className="blockchain-top">
         <path
           d={HEX_TOP}
           fill="currentColor"
@@ -55,7 +55,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Top-left hexagon */}
-      <g>
+      <g className="blockchain-tl">
         <path
           d={HEX_TOP_LEFT}
           fill="currentColor"
@@ -67,7 +67,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Top-right hexagon */}
-      <g>
+      <g className="blockchain-tr">
         <path
           d={HEX_TOP_RIGHT}
           fill="currentColor"
@@ -79,7 +79,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Bottom-left hexagon */}
-      <g>
+      <g className="blockchain-bl">
         <path
           d={HEX_BOTTOM_LEFT}
           fill="currentColor"
@@ -91,7 +91,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Bottom-right hexagon */}
-      <g>
+      <g className="blockchain-br">
         <path
           d={HEX_BOTTOM_RIGHT}
           fill="currentColor"
@@ -109,7 +109,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
       </g>
 
       {/* Bottom hexagon */}
-      <g>
+      <g className="blockchain-bottom">
         <path
           d={HEX_BOTTOM}
           fill="currentColor"
@@ -135,7 +135,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-1"
       />
       <line
         x1="75"
@@ -145,7 +145,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-2"
       />
       <line
         x1="125"
@@ -155,7 +155,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-3"
       />
       <line
         x1="75"
@@ -165,7 +165,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-4"
       />
       <line
         x1="125"
@@ -175,7 +175,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-5"
       />
       <line
         x1="100"
@@ -185,7 +185,7 @@ export function BlockchainIcon({ className }: BlockchainIconProps) {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.3"
+        className="blockchain-line-6"
       />
     </svg>
   );

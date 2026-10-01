@@ -11,7 +11,7 @@ import {
 const DETAIL_LINE_CLASS = "block text-xs font-normal text-base-content/70";
 
 const VENUE_LINK_CLASS =
-  "block w-fit underline-offset-4 hover:underline";
+  "block w-fit underline-offset-4 transition-colors duration-150 hover:underline";
 
 /**
  * Venue of one event, as the card and the event page both write it: the building, the

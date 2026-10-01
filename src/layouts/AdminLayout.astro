@@ -16,7 +16,7 @@ const NAV_LINKS = [
 ] as const;
 
 const NAV_LINK_CLASS =
-  "rounded-md px-2 py-1 text-sm hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "rounded-md px-2 py-1 text-sm transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 // `trailingSlash: "ignore"` wpuszcza tu obie postacie adresu.
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
@@ -106,7 +106,7 @@ const showNav = Astro.locals.isAuthenticated === true;
           <div class="flex min-w-0 items-center gap-2 sm:gap-3">
             <a
               href="/admin"
-              class="flex min-w-0 items-center gap-2 rounded-md hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+              class="flex min-w-0 items-center gap-2 rounded-md transition-colors duration-150 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
             >
               <img
                 src="/assets/img/blockchainwares.svg"

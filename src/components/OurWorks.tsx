@@ -1,90 +1,244 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { cn } from "../lib/utils";
 import { SectionHeader, SectionWrapper } from "./ui";
-import { SECTIONS, section_slug_from_id } from "./our-works-data";
+import { useScrollAnimation, useAutoRotate, useInView } from "../hooks";
+import {
+  SECTIONS,
+  is_section_slug,
+  section_id_from_slug,
+  section_slug_from_id,
+  type SectionSlug,
+} from "./our-works-data";
 import { SectionNav, ContentPanel, MobileTabs } from "./our-works";
-import { build_tab_url } from "./our-works/deep_link";
 
 const SECTION_ANCHOR_ID = "what-we-do";
 /** Deep-links land on the tab content, not on the section heading above it. */
 const CONTENT_ANCHOR_ID = "what-we-do-content";
+/** Navigation.tsx renders a fixed h-16 bar — keep the content below it. */
+const NAV_OFFSET_PX = 64;
+/** Breathing room between the navbar and the top of the opened category. */
+const CONTENT_GAP_PX = 16;
+/** Above this the page was scrolled by the user, so a deep-link jump would fight them. */
+const FRESH_LOAD_SCROLL_PX = 8;
+const SPLASH_WAIT_TIMEOUT_MS = 4000;
 
-interface OurWorksProps {
-  /** Section opened by `?tab=` / bare `?slug`, resolved on the server from the request URL. */
-  deepLinkId?: string | null;
+/** Reads `?tab=docs`, falling back to a bare `?docs`; keys carrying a value are ignored. */
+function read_tab_slug(search: string): string | null {
+  const params = new URLSearchParams(search);
+  const named = params.get("tab");
+  if (named) return named;
+  for (const [key, value] of params) {
+    if (value === "") return key;
+  }
+  return null;
+}
+
+/** Keeps unrelated params, drops a stale bare alias, writes the canonical `?tab=`. */
+function build_tab_url(slug: SectionSlug): string {
+  const url = new URL(window.location.href);
+  for (const key of [...url.searchParams.keys()]) {
+    if (is_section_slug(key)) url.searchParams.delete(key);
+  }
+  url.searchParams.set("tab", slug);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
+function scroll_to_content(element: HTMLElement): void {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const top =
+    element.getBoundingClientRect().top +
+    window.scrollY -
+    NAV_OFFSET_PX -
+    CONTENT_GAP_PX;
+  window.scrollTo({
+    top: Math.max(top, 0),
+    behavior: reduced ? "instant" : "smooth",
+  });
+}
+
+/** Single scroll path for both the pre-hydration jump and the hydrated effect. */
+function scroll_to_deep_link_target(): () => void {
+  const element = document.getElementById(CONTENT_ANCHOR_ID);
+  if (!element || window.scrollY > FRESH_LOAD_SCROLL_PX) return () => {};
+  return when_scroll_unlocked(() => scroll_to_content(element));
 }
 
 /**
- * Unified "What We Do" section — sticky sidebar (desktop) / tabs (mobile) and a
- * content panel with expertise badges woven into each section.
- *
- * The server renders the deep-linked section open, so hydration never swaps
- * panels under a page that has already jumped to it.
+ * The splash screen in index.astro locks `<html>` overflow for ~2.5s;
+ * scrolling while it holds the lock is a no-op.
  */
-export function OurWorks({ deepLinkId = null }: OurWorksProps) {
-  const [active_id, set_active_id] = useState<string>(
-    deepLinkId ?? SECTIONS[0]?.id ?? "",
+function when_scroll_unlocked(run: () => void): () => void {
+  const is_locked = () => document.documentElement.style.overflow === "hidden";
+  if (!is_locked()) {
+    run();
+    return () => {};
+  }
+
+  const observer = new MutationObserver(() => {
+    if (!is_locked()) finish();
+  });
+  const timeout_id = setTimeout(finish, SPLASH_WAIT_TIMEOUT_MS);
+
+  function finish(): void {
+    observer.disconnect();
+    clearTimeout(timeout_id);
+    run();
+  }
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["style"],
+  });
+
+  return () => {
+    observer.disconnect();
+    clearTimeout(timeout_id);
+  };
+}
+
+/**
+ * The island is `client:visible`, so the effect below cannot run before the user
+ * reaches the section. This module ships in the shared island chunk that the
+ * `client:load` navigation pulls at page load, so the jump can happen up front
+ * and hydration catches up once the section is on screen.
+ */
+function bootstrap_deep_link_scroll(): void {
+  if (typeof window === "undefined") return;
+
+  const slug = read_tab_slug(window.location.search);
+  if (slug === null || section_id_from_slug(slug) === null) return;
+
+  scroll_to_deep_link_target();
+}
+
+bootstrap_deep_link_scroll();
+
+/**
+ * Unified "What We Do" section — single integrated UI.
+ *
+ * One header, sticky sidebar (desktop) / horizontal tabs (mobile), content panel
+ * with expertise badges woven into each section as metadata. No separate
+ * expertise grid block — competencies are surfaced organically inside the
+ * portfolio.
+ *
+ * Auto-rotates through sections with a progress bar indicator, paused while the
+ * section is off-screen (`data-in-view`). A `?tab=` or bare `?slug` query opens
+ * that section directly and cancels the rotation.
+ */
+export function OurWorks() {
+  const { ref, is_visible } = useScrollAnimation<HTMLElement>();
+  const in_view = useInView(ref);
+  const [active_id, set_active_id] = useState<string>(SECTIONS[0]?.id ?? "");
+  const deep_link_handled = useRef(false);
+
+  const active_index = useMemo(
+    () => SECTIONS.findIndex((s) => s.id === active_id),
+    [active_id]
   );
 
-  const handle_select = useCallback((id: string) => {
-    if (!SECTIONS.some((s) => s.id === id)) return;
-    set_active_id(id);
-
-    const slug = section_slug_from_id(id);
-    if (slug) {
-      window.history.replaceState(
-        window.history.state,
-        "",
-        build_tab_url(slug),
-      );
-    }
+  const handle_index_change = useCallback((index: number) => {
+    const section = SECTIONS[index];
+    if (section) set_active_id(section.id);
   }, []);
+
+  const { is_auto_playing, progress_key, handle_user_select } = useAutoRotate({
+    count: SECTIONS.length,
+    active_index,
+    on_change: handle_index_change,
+    in_view: in_view !== false,
+  });
+
+  const handle_select = useCallback(
+    (id: string) => {
+      const index = SECTIONS.findIndex((s) => s.id === id);
+      if (index === -1) return;
+      handle_user_select(index);
+
+      const slug = section_slug_from_id(id);
+      if (slug) {
+        window.history.replaceState(
+          window.history.state,
+          "",
+          build_tab_url(slug)
+        );
+      }
+    },
+    [handle_user_select]
+  );
+
+  // Query string is only available client-side — the page itself stays prerendered.
+  useEffect(() => {
+    if (deep_link_handled.current) return;
+    deep_link_handled.current = true;
+
+    const slug = read_tab_slug(window.location.search);
+    if (slug === null) return;
+    const target_id = section_id_from_slug(slug);
+    if (target_id === null) return;
+    const index = SECTIONS.findIndex((section) => section.id === target_id);
+    if (index === -1) return;
+
+    // Same path as a click: opens the tab and stops auto-rotation for good.
+    handle_user_select(index);
+
+    return scroll_to_deep_link_target();
+  }, [handle_user_select]);
 
   return (
     <section
+      ref={ref}
       id={SECTION_ANCHOR_ID}
-      className="relative py-16 md:py-24 lg:py-32 px-4"
+      data-in-view={in_view === null ? undefined : String(in_view)}
+      className={cn(
+        "relative py-16 md:py-24 lg:py-32 px-4",
+        is_visible && "is-visible"
+      )}
     >
       <SectionWrapper maxWidth="max-w-7xl">
-        <SectionHeader
-          eyebrow="Our Expertise"
-          title="What"
-          accent="We Do"
-          description="End-to-end engineering across blockchain, EDA, data, and frontend — shipped in production for partners worldwide."
-          className="mb-12 md:mb-16"
-        />
+          <SectionHeader
+            eyebrow="Our Expertise"
+            title="What"
+            accent="We Do"
+            description="End-to-end engineering across blockchain, EDA, data, and frontend — shipped in production for partners worldwide."
+            isVisible={is_visible}
+            className="mb-12 md:mb-16"
+          />
 
-        {/* Deep-link scroll target: on mobile it includes the tabs, so the
-            opened category stays identifiable once the heading is off-screen.
-            scroll-mt-20 = fixed h-16 navbar + 1rem gap. */}
-        <div
-          id={CONTENT_ANCHOR_ID}
-          className="scroll-mt-20"
-          data-deep-link={deepLinkId ? "" : undefined}
-        >
-          <div className="md:hidden mb-6">
-            <MobileTabs
-              sections={SECTIONS}
-              active_id={active_id}
-              on_select={handle_select}
-            />
-          </div>
+          {/* Deep-link scroll target: on mobile it includes the tabs, so the
+              opened category stays identifiable once the heading is off-screen. */}
+          <div id={CONTENT_ANCHOR_ID}>
+            {/* Mobile tabs — visible below md */}
+            <div className="md:hidden mb-6">
+              <MobileTabs
+                sections={SECTIONS}
+                active_id={active_id}
+                on_select={handle_select}
+                is_auto_playing={is_auto_playing}
+                progress_key={progress_key}
+              />
+            </div>
 
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-10 max-w-6xl mx-auto">
-            <aside className="hidden md:block md:w-[35%] lg:w-[32%] shrink-0">
-              <div className="sticky top-24">
-                <SectionNav
-                  sections={SECTIONS}
-                  active_id={active_id}
-                  on_select={handle_select}
-                />
+            {/* Two-panel layout — desktop */}
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-10 max-w-6xl mx-auto">
+              {/* Left sidebar — hidden on mobile, sticky on desktop */}
+              <aside className="hidden md:block md:w-[35%] lg:w-[32%] shrink-0">
+                <div className="sticky top-24">
+                  <SectionNav
+                    sections={SECTIONS}
+                    active_id={active_id}
+                    on_select={handle_select}
+                    is_auto_playing={is_auto_playing}
+                    progress_key={progress_key}
+                  />
+                </div>
+              </aside>
+
+              {/* Right content panel */}
+              <div className="flex-1 min-w-0">
+                <ContentPanel sections={SECTIONS} active_id={active_id} />
               </div>
-            </aside>
-
-            <div className="flex-1 min-w-0">
-              <ContentPanel sections={SECTIONS} active_id={active_id} />
             </div>
           </div>
-        </div>
       </SectionWrapper>
     </section>
   );

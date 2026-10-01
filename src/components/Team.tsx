@@ -1,17 +1,23 @@
 import { cn } from "../lib/utils";
 import { SectionHeader, SectionWrapper } from "./ui";
+import { useScrollAnimation } from "../hooks";
 
 /**
  * Team section component
- * Displays team photo
+ * Displays team photo with scroll-triggered animations
  * Features:
  * - Large centered team photo
  * - Subtle border with glow effect
+ * - Hover zoom animation
  * - Rounded corners
+ * - Scroll-triggered fade-in and scale animations (CSS-based)
  */
 export function Team() {
+  const { ref, is_visible } = useScrollAnimation<HTMLElement>();
+
   return (
     <section
+      ref={ref}
       id="team"
       className="relative min-h-screen flex items-center py-16 md:py-24 lg:py-32 px-4"
     >
@@ -21,6 +27,7 @@ export function Team() {
           title="Our"
           accent="Team"
           description="A dedicated team of engineers and developers passionate about building cutting-edge solutions in blockchain technology and high-performance software."
+          isVisible={is_visible}
           className="mb-12 md:mb-16"
         />
 
@@ -30,7 +37,10 @@ export function Team() {
             "bg-base-200/30 backdrop-blur-sm",
             "border border-white/5",
             "shadow-card",
-            "hover:shadow-card-hover"
+            "transition-shadow duration-300",
+            "hover:shadow-card-hover",
+            "scale-in stagger-3",
+            is_visible && "is-visible"
           )}
         >
           <div className="relative overflow-hidden rounded-xl z-10">

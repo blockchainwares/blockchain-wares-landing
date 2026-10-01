@@ -102,7 +102,7 @@ export function RequestsChart({ buckets }: RequestsChartProps) {
           return (
             <g
               key={bucket.date}
-              className="opacity-80 hover:opacity-100"
+              className="opacity-80 transition-opacity duration-150 hover:opacity-100 motion-reduce:transition-none"
             >
               <title>
                 {`${format_date(bucket.date, long_date_formatter)}: ${integer_formatter.format(bucket.count)} żądań`}

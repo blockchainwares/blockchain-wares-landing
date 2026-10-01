@@ -37,13 +37,13 @@ const TONE_STYLES: Readonly<Record<SwitchTone, ToneStyle>> = {
 };
 
 const TRACK_CLASS =
-  "inline-flex h-5 w-9 shrink-0 items-center rounded-full border";
+  "inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors duration-150 motion-reduce:transition-none";
 
 const THUMB_CLASS =
-  "block size-3.5 rounded-full";
+  "block size-3.5 rounded-full transition duration-150 motion-reduce:transition-none";
 
 const FOCUS_CLASS =
-  "focus-visible:outline-2 focus-visible:outline-offset-2";
+  "focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors duration-150 motion-reduce:transition-none";
 
 interface SwitchLinkProps {
   /** Adres odwracajacy flage — panel nie ma JS-a, wiec przelacznik jest linkiem. */

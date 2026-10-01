@@ -48,7 +48,7 @@ export function DatabaseIcon({ className }: DatabaseIconProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g>
+      <g className="db-cylinder">
         {layers.map((layer, i) => (
           <g key={layer.label} className={`db-layer-${i}`}>
             {/* Cylinder body fill: path from top ellipse arc down to bottom ellipse arc */}
@@ -136,7 +136,7 @@ export function DatabaseIcon({ className }: DatabaseIconProps) {
       </g>
 
       {/* Query indicator (magnifying glass) — separate layer, drawn last */}
-      <g>
+      <g className="db-magnifier">
         <circle
           cx={148}
           cy={72}

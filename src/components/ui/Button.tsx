@@ -12,7 +12,7 @@ interface ButtonProps {
 }
 
 /**
- * Button component
+ * Button component with CSS transitions
  * Supports multiple variants and sizes using DaisyUI theme
  */
 export function Button({
@@ -25,7 +25,7 @@ export function Button({
   type = "button",
 }: ButtonProps) {
   const base_styles =
-    "inline-flex items-center justify-center rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:pointer-events-none disabled:opacity-50";
+    "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]";
 
   const variant_styles = {
     primary: "bg-primary text-primary-content hover:bg-primary/90 shadow-sm hover:shadow-md",

@@ -25,9 +25,6 @@ const section_anchors: SectionAnchor[] = [
 
 const page_links: PageLink[] = [{ label: "Markets", href: "/markets" }];
 
-const DRAWER_ID = "mobile-menu";
-const FOCUSABLE_SELECTOR = "a[href], button:not([disabled])";
-
 /** Removes trailing slashes so "/markets/" and "/markets" compare equal */
 function normalize_path(path: string): string {
   return path.replace(/\/+$/, "") || "/";
@@ -51,10 +48,11 @@ interface NavigationProps {
  * Responsive navigation component with sticky behavior and mobile menu
  * Features:
  * - Desktop: logo, section anchors, separator, page links (Markets)
- * - Mobile: hamburger menu with a drawer, same two-group split
+ * - Mobile: hamburger menu with animated drawer, same two-group split
  * - Backdrop blur on scroll
  * - Active section highlighting via scroll-spy (section anchors only)
  * - Page links are highlighted from currentPath and carry aria-current="page"
+ * - CSS-based animations (no external animation library)
  */
 export function Navigation({ currentPath = "/" }: NavigationProps) {
   const current_path = normalize_path(currentPath);
@@ -63,21 +61,19 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
   const [is_scrolled, set_is_scrolled] = useState(false);
   const [active_section, set_active_section] = useState<string>("");
   const menu_button_ref = useRef<HTMLButtonElement>(null);
-  const logo_ref = useRef<HTMLAnchorElement>(null);
   const drawer_ref = useRef<HTMLDivElement>(null);
   const was_open_ref = useRef(false);
 
   // Combined scroll handler with throttle (performance optimization)
   useEffect(() => {
     let ticking = false;
-    let frame_id = 0;
     // Only section anchors map to sections of the landing page
     const section_ids = section_anchors.map((item) => item.href.slice(1));
 
     // Use named function stored in ref to ensure same reference in cleanup
     const handle_scroll_impl = () => {
       if (!ticking) {
-        frame_id = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
           // Update backdrop blur state
           set_is_scrolled(window.scrollY > 20);
 
@@ -117,10 +113,7 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
 
     // Use passive listener for better scroll performance
     window.addEventListener("scroll", handle_scroll_impl, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handle_scroll_impl);
-      window.cancelAnimationFrame(frame_id);
-    };
+    return () => window.removeEventListener("scroll", handle_scroll_impl);
   }, [is_home]);
 
   // Close menu on navigation
@@ -128,70 +121,18 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
     set_is_open(false);
   };
 
+  // Lock only while the drawer is open — clearing it on mount would release
+  // the splash screen's lock on <body> before the intro finishes
   useEffect(() => {
     if (!is_open) return;
     const body_style = document.body.style;
     body_style.overflow = "hidden";
     return () => {
-      body_style.overflow = "";
-    };
-  }, [is_open]);
-
-  // Modal drawer: focus moves in on open, Tab cycles inside, Escape closes
-  // (the effect below hands focus back to the trigger)
-  useEffect(() => {
-    const drawer = drawer_ref.current;
-    if (!is_open || !drawer) return;
-
-    const focusables = () =>
-      Array.from(drawer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-    focusables()[0]?.focus();
-
-    const handle_keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        set_is_open(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const items = focusables();
-      const first = items[0];
-      const last = items[items.length - 1];
-      if (!first || !last) return;
-
-      const active = document.activeElement;
-      const outside = !(active instanceof Node) || !drawer.contains(active);
-      if (event.shiftKey && (active === first || outside)) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && (active === last || outside)) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handle_keydown);
-    return () => document.removeEventListener("keydown", handle_keydown);
-  }, [is_open]);
-
-  // aria-modal alone does not stop pointer or AT access to the page behind,
-  // so every other top-level body child goes inert while the drawer is open
-  useEffect(() => {
-    const drawer = drawer_ref.current;
-    if (!is_open || !drawer) return;
-
-    let host: HTMLElement = drawer;
-    while (host.parentElement && host.parentElement !== document.body) {
-      host = host.parentElement;
-    }
-    const silenced = Array.from(document.body.children).filter(
-      (element): element is HTMLElement =>
-        element instanceof HTMLElement && element !== host && !element.inert,
-    );
-    for (const element of silenced) element.inert = true;
-    return () => {
-      for (const element of silenced) element.inert = false;
+      // The splash locks <html> and <body> alike (the drawer only <body>) and
+      // its finish() clears both, so a locked <html> means the splash still owns it
+      const splash_locked =
+        document.documentElement.style.overflow === "hidden";
+      body_style.overflow = splash_locked ? "hidden" : "";
     };
   }, [is_open]);
 
@@ -206,7 +147,7 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
     return () => desktop_query.removeEventListener("change", handle_change);
   }, []);
 
-  // The closed drawer is `hidden`, so the browser drops focus to <body> when it
+  // The closed drawer is `inert`, so the browser drops focus to <body> when it
   // closes — hand focus back to the trigger so keyboard users keep their place
   useEffect(() => {
     if (is_open) {
@@ -221,11 +162,7 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
       active === null ||
       active === document.body ||
       drawer_ref.current?.contains(active) === true;
-    if (!lost_focus) return;
-    // Closing by widening past `md` hides the trigger too (`md:hidden`)
-    const trigger = menu_button_ref.current;
-    const target = trigger?.offsetParent ? trigger : logo_ref.current;
-    target?.focus();
+    if (lost_focus) menu_button_ref.current?.focus();
   }, [is_open]);
 
   // Prefix match, so a page's own subpages keep its link lit; "/" only ever matches itself
@@ -239,7 +176,7 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-50",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out",
           is_scrolled
             ? "bg-base-100/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
             : "bg-transparent",
@@ -249,9 +186,8 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <a
-              ref={logo_ref}
               href={is_home ? "#" : "/"}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
             >
               <img
                 src="/assets/img/blockchainwares.svg"
@@ -300,10 +236,9 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
             <button
               ref={menu_button_ref}
               onClick={() => set_is_open(!is_open)}
-              className="md:hidden p-2 text-base-content hover:text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg"
+              className="md:hidden p-2 text-base-content hover:text-secondary transition-all duration-150 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg"
               aria-label={is_open ? "Close menu" : "Open menu"}
               aria-expanded={is_open}
-              aria-controls={DRAWER_ID}
             >
               <HamburgerIcon is_open={is_open} />
             </button>
@@ -314,27 +249,32 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
       {/* Mobile Menu Backdrop — sibling of nav, not child */}
       <div
         aria-hidden="true"
-        hidden={!is_open}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+        className={cn(
+          "fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300",
+          is_open ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
         onClick={() => set_is_open(false)}
       />
 
-      {/* Mobile Menu Drawer — sibling of nav, not child */}
+      {/* Mobile Menu Drawer — sibling of nav, not child.
+          `inert` when closed keeps the off-screen links out of the tab order and
+          out of the accessibility tree; it does not block the slide-out
+          transition, which runs on the `translate` property. */}
       <div
         ref={drawer_ref}
-        id={DRAWER_ID}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menu"
-        hidden={!is_open}
-        className="fixed top-0 right-0 bottom-0 w-full sm:w-80 bg-base-100 border-l border-base-300 z-[70] overflow-y-auto"
+        inert={!is_open}
+        className={cn(
+          "fixed top-0 right-0 bottom-0 w-full sm:w-80 bg-base-100 border-l border-base-300 z-[70] overflow-y-auto",
+          "transform transition-transform duration-300 ease-out",
+          is_open ? "translate-x-0" : "translate-x-full",
+        )}
       >
         <div className="p-6">
           {/* Close Button */}
           <div className="flex justify-end mb-8">
             <button
               onClick={() => set_is_open(false)}
-              className="p-2 text-base-content hover:text-secondary rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              className="p-2 text-base-content hover:text-secondary transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               aria-label="Close menu"
             >
               <HamburgerIcon is_open={true} />
@@ -405,18 +345,21 @@ function DesktopAnchorLink({ label, href, is_active }: NavLinkProps) {
     <a
       href={href}
       className={cn(
-        "relative text-sm font-semibold px-3 lg:px-4 py-2 rounded-full",
+        "relative text-sm font-semibold px-3 lg:px-4 py-2 rounded-full transition-all duration-300",
         is_active ? "text-white" : "text-neutral-300 hover:text-white",
       )}
     >
       {/* Glow blob behind active link */}
-      {is_active ? (
-        <span className="absolute inset-0 rounded-full bg-secondary/20 blur-md scale-110" />
-      ) : null}
+      <span
+        className={cn(
+          "absolute inset-0 rounded-full bg-secondary/20 blur-md transition-all duration-500",
+          is_active ? "opacity-100 scale-110" : "opacity-0 scale-75",
+        )}
+      />
       {/* Subtle background pill */}
       <span
         className={cn(
-          "absolute inset-0 rounded-full",
+          "absolute inset-0 rounded-full transition-all duration-300",
           is_active ? "bg-secondary/30" : "bg-transparent hover:bg-white/5",
         )}
       />
@@ -433,14 +376,19 @@ function DesktopPageLink({ label, href, is_active }: NavLinkProps) {
       href={href}
       aria-current={is_active ? "page" : undefined}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 lg:px-4 py-1.5",
-        "text-sm font-semibold",
+        "group inline-flex items-center gap-2 rounded-full border px-3 lg:px-4 py-1.5",
+        "text-sm font-semibold transition-colors duration-200",
         is_active
           ? "border-secondary/70 bg-secondary/15 text-secondary"
           : "border-secondary/30 text-secondary/85 hover:border-secondary/60 hover:bg-secondary/10 hover:text-secondary",
       )}
     >
-      <AccentDiamond className={cn("rotate-45", is_active && "scale-125")} />
+      <AccentDiamond
+        className={cn(
+          "rotate-45 transition-transform duration-200",
+          is_active ? "scale-125" : "group-hover:rotate-[135deg]",
+        )}
+      />
       {label}
     </a>
   );
@@ -458,7 +406,7 @@ function MobileAnchorLink({
       href={href}
       onClick={on_click}
       className={cn(
-        "block text-lg font-medium py-2 border-l-2 pl-3",
+        "block text-lg font-medium transition-colors py-2 border-l-2 pl-3",
         is_active
           ? "text-secondary border-secondary"
           : "text-base-content hover:text-secondary border-transparent",
@@ -483,7 +431,7 @@ function MobilePageLink({
       aria-current={is_active ? "page" : undefined}
       className={cn(
         "flex items-center gap-2.5 rounded-2xl border px-3 py-2.5",
-        "text-lg font-semibold",
+        "text-lg font-semibold transition-colors duration-200",
         is_active
           ? "border-secondary/70 bg-secondary/15 text-secondary"
           : "border-secondary/30 text-secondary/85 hover:border-secondary/60 hover:bg-secondary/10 hover:text-secondary",
@@ -496,7 +444,7 @@ function MobilePageLink({
 }
 
 /**
- * Hamburger / close menu icon
+ * Simple hamburger menu icon (no animation)
  */
 function HamburgerIcon({ is_open }: { is_open: boolean }) {
   if (is_open) {

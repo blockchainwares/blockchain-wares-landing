@@ -16,8 +16,8 @@ export function HiveIcon({ className }: HiveIconProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d={HIVE_BAR_1} fill="currentColor" opacity="0.85" />
-      <path d={HIVE_BAR_2} fill="currentColor" opacity="0.85" />
+      <path d={HIVE_BAR_1} fill="currentColor" className="hive-bar-1" />
+      <path d={HIVE_BAR_2} fill="currentColor" className="hive-bar-2" />
     </svg>
   );
 }

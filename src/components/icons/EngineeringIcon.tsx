@@ -21,7 +21,7 @@ export function EngineeringIcon({ className }: EngineeringIconProps) {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Main large gear - center */}
-      <g>
+      <g className="eng-gear-main">
         <path
           d={GEAR_MAIN_PATH}
           fill="currentColor"
@@ -51,7 +51,7 @@ export function EngineeringIcon({ className }: EngineeringIconProps) {
 
       {/* Top-left gear — shifted away from main to mesh without overlap */}
       <g transform="translate(-10, -10)">
-        <g>
+        <g className="eng-gear-tl">
           <path
             d={GEAR_TL_PATH}
             fill="currentColor"
@@ -74,7 +74,7 @@ export function EngineeringIcon({ className }: EngineeringIconProps) {
 
       {/* Bottom-right gear — shifted away from main to mesh without overlap */}
       <g transform="translate(4, 7)">
-        <g>
+        <g className="eng-gear-br">
           <path
             d={GEAR_BR_PATH}
             fill="currentColor"

@@ -6,7 +6,7 @@ const FIELD_ID = "admin-password";
 const ERROR_ID = "admin-login-error";
 
 const SUBMIT_CLASS =
-  "w-full rounded-md border border-secondary/40 bg-secondary/10 px-3 py-2 text-sm font-semibold text-secondary hover:border-secondary/60 hover:bg-secondary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "w-full rounded-md border border-secondary/40 bg-secondary/10 px-3 py-2 text-sm font-semibold text-secondary transition-colors duration-150 hover:border-secondary/60 hover:bg-secondary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 type LoginFormProps = {
   /** Sciezka zwalidowana przez `safe_target` — jedziemy z nia dalej bez zmian. */

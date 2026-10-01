@@ -61,6 +61,7 @@ export function EventLinks({ links, theme, className }: EventLinksProps) {
             rel="noopener noreferrer"
             className={cn(
               "inline-flex w-fit items-center gap-1.5 rounded-sm text-sm font-medium",
+              "transition-colors duration-150",
               "focus-visible:outline-none focus-visible:ring-2",
               theme.link,
             )}

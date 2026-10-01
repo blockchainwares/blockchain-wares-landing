@@ -34,7 +34,7 @@ export function RelatedEvents({ related }: { related: RelatedEvent[] }) {
             <li key={event.id}>
               <a
                 href={get_event_path(event)}
-                className="flex flex-col gap-1 rounded-2xl border border-white/5 bg-base-200/30 px-5 py-4 hover:shadow-card-hover md:flex-row md:items-baseline md:gap-4"
+                className="flex flex-col gap-1 rounded-2xl border border-white/5 bg-base-200/30 px-5 py-4 transition-shadow duration-300 hover:shadow-card-hover md:flex-row md:items-baseline md:gap-4"
               >
                 <span
                   className={cn(

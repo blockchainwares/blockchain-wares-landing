@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState, type ReactElement } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { cn } from "../lib/utils";
 import {
   format_event_date,
@@ -18,7 +19,23 @@ import { get_event_hours, STATUS_THEME } from "./event-theme";
 import { EventBadges } from "./EventBadges";
 import { EventHours } from "./EventHours";
 
+const EASE: [number, number, number, number] = [0.44, 0, 0.56, 1];
+
 const PROMOTED_LIMIT = 2;
+
+const MOTION_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: EASE },
+  },
+};
+
+const STATIC_VARIANTS: Variants = {
+  hidden: { opacity: 1, y: 0 },
+  visible: { opacity: 1, y: 0 },
+};
 
 interface BannerAccent {
   /** Text tone kept at full opacity for WCAG AA on small text */
@@ -76,10 +93,14 @@ interface EventBannerProps {
  * Renders nothing when nothing is worth promoting — an empty list included.
  */
 export function EventBanner({ events, todayIso }: EventBannerProps) {
+  const prefers_reduced_motion = useReducedMotion();
   const [now, set_now] = useState(() => parse_iso_day(todayIso));
+  // useReducedMotion() is null on the server, so the preference may only be applied after mount
+  const [is_hydrated, set_is_hydrated] = useState(false);
 
   useEffect(() => {
     set_now(new Date());
+    set_is_hydrated(true);
   }, []);
 
   const promoted = get_promoted_events(now, PROMOTED_LIMIT, events);
@@ -88,6 +109,8 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
     return null;
   }
 
+  const variants =
+    is_hydrated && prefers_reduced_motion ? STATIC_VARIANTS : MOTION_VARIANTS;
   const has_ongoing = promoted.some(
     (event) => get_event_status(event, now) === "ongoing",
   );
@@ -95,7 +118,11 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
   const is_single = promoted.length === 1;
 
   return (
-    <aside
+    <motion.aside
+      variants={variants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.4 }}
       aria-label="Where to meet us"
       className="relative px-4 py-8 md:py-12"
     >
@@ -110,6 +137,7 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
           "border",
           accent.border,
           "shadow-card",
+          "transition-[border-color,box-shadow] duration-200 ease-out",
           "has-[a:hover]:shadow-card-hover",
         )}
       >
@@ -134,7 +162,7 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
             // Lifts the 44px touch target out of the flow instead of padding the strip
             "py-2 -my-2 pl-[calc(0.875rem+0.75rem)] md:pl-0",
             "text-sm font-semibold underline-offset-4 md:text-base",
-            "hover:underline",
+            "transition-colors duration-150 hover:underline",
             accent.text,
           )}
         >
@@ -142,7 +170,7 @@ export function EventBanner({ events, todayIso }: EventBannerProps) {
           <ArrowRightIcon />
         </a>
       </div>
-    </aside>
+    </motion.aside>
   );
 }
 
@@ -216,7 +244,7 @@ function BannerEntry({
           <span
             className={cn(
               "text-base font-bold text-base-content",
-              "underline-offset-4",
+              "underline-offset-4 transition-colors duration-150",
               "group-hover/entry:underline group-focus-visible/entry:underline",
               accent.headline,
               is_single && "md:text-lg",
@@ -287,7 +315,7 @@ function ArrowRightIcon() {
       viewBox="0 0 12 12"
       fill="none"
       aria-hidden="true"
-      className="shrink-0"
+      className="shrink-0 transition-transform duration-150 ease-out group-hover:translate-x-1"
     >
       <path
         d="M1.5 6H10M10 6 6.75 2.75M10 6 6.75 9.25"

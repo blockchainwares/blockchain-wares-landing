@@ -61,7 +61,7 @@ export const STATUS_THEME: Record<EventStatus, StatusTheme> = {
     label: "Happening now",
     card: "border-success/40",
     badge: "border-success/40 bg-success/10 text-success",
-    dot: "bg-success",
+    dot: "bg-success motion-safe:animate-pulse",
     date_block: "border-success/40 bg-success/10",
     accent: "text-success",
     topic: "border-success/25 bg-success/5 text-success",

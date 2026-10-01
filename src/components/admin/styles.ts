@@ -3,17 +3,17 @@
 import { ICON_KEYS } from "../event-types";
 
 export const BUTTON_CLASS =
-  "inline-flex items-center rounded-md border border-base-300 bg-base-200 px-3 py-1.5 text-sm font-medium hover:border-secondary/50 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-base-300 disabled:hover:text-base-content";
+  "inline-flex items-center rounded-md border border-base-300 bg-base-200 px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-secondary/50 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-base-300 disabled:hover:text-base-content";
 
 /** Wariant dla `<span>` udajacego wylaczony przycisk — linku nie da sie `disabled`. */
 export const BUTTON_DISABLED_CLASS =
   "inline-flex cursor-not-allowed items-center rounded-md border border-base-300 bg-base-200 px-3 py-1.5 text-sm font-medium text-base-content/40";
 
 export const FIELD_CLASS =
-  "w-full rounded-md border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content placeholder:text-base-content/40 hover:border-base-content/20 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-md border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content transition-colors duration-150 placeholder:text-base-content/40 hover:border-base-content/20 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-60";
 
 export const SELECT_CLASS =
-  "rounded-md border border-base-300 bg-base-200 px-2 py-1.5 text-sm hover:border-secondary/50 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "rounded-md border border-base-300 bg-base-200 px-2 py-1.5 text-sm transition-colors duration-150 hover:border-secondary/50 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 export const LABEL_CLASS =
   "mb-1 block text-xs font-medium tracking-wide text-base-content/60 uppercase";
@@ -22,13 +22,13 @@ export const CARD_CLASS = "rounded-md border border-base-300 bg-base-100 p-4";
 
 /** Kontrolka `select` w formularzu: `SELECT_CLASS` jest skrojony pod pasek narzedziowy. */
 export const SELECT_CONTROL_CLASS =
-  "w-full rounded-md border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content hover:border-base-content/20 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "w-full rounded-md border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content transition-colors duration-150 hover:border-base-content/20 focus-visible:border-secondary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 export const ERROR_CONTROL_CLASS =
   "border-error/60 focus-visible:border-error focus-visible:outline-error";
 
 export const SUBMIT_CLASS =
-  "inline-flex items-center rounded-md border border-secondary/40 bg-secondary/10 px-4 py-2 text-sm font-semibold text-secondary hover:border-secondary/60 hover:bg-secondary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "inline-flex items-center rounded-md border border-secondary/40 bg-secondary/10 px-4 py-2 text-sm font-semibold text-secondary transition-colors duration-150 hover:border-secondary/60 hover:bg-secondary/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 
 /** Pionowy pasek przy etykiecie grupy — ten sam znak, co w `TrafficFilters`. */
 export const RAIL_CLASS = "h-3 w-0.5 shrink-0 rounded-full";
@@ -39,7 +39,7 @@ export const GROUP_LABEL_CLASS = "text-xs font-semibold tracking-wide uppercase"
 export const ROW_CLASS = "px-4 py-4 sm:px-5";
 
 export const SLOT_CLASS =
-  "rounded-md border bg-base-200/40 p-2";
+  "rounded-md border bg-base-200/40 p-2 transition-colors duration-150 motion-reduce:transition-none";
 
 export const SLOT_EMPTY_CLASS = "border-dashed border-base-300";
 
@@ -52,7 +52,7 @@ export const ICON_BOX_CLASS =
 
 /** Przyciski „+" i „×" slotow — mniejsze od `BUTTON_CLASS`, ten sam jezyk. */
 export const GHOST_BUTTON_CLASS =
-  "inline-flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-md border border-base-300 bg-base-200 px-2 text-xs font-medium hover:border-secondary/50 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "inline-flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-md border border-base-300 bg-base-200 px-2 text-xs font-medium transition-colors duration-150 hover:border-secondary/50 hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary motion-reduce:transition-none";
 
 /** Wariant „komplet": `aria-disabled`, nie `disabled` — przycisk zostaje w kolejnosci Tab. */
 export const GHOST_BUTTON_FULL_CLASS =

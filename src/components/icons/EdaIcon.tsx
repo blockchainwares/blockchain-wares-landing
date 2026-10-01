@@ -2,6 +2,10 @@ interface EdaIconProps {
   className?: string;
 }
 
+function pin_delay(seconds: number): string {
+  return `${seconds.toFixed(2)}s`;
+}
+
 export function EdaIcon({ className }: EdaIconProps) {
   return (
     <svg
@@ -21,6 +25,7 @@ export function EdaIcon({ className }: EdaIconProps) {
         fillOpacity="0.12"
         stroke="currentColor"
         strokeWidth="2"
+        className="eda-chip"
       />
 
       {/* Inner die */}
@@ -64,7 +69,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy={y}
             r="3"
             fill="currentColor"
-            opacity="0.6"
+            className="eda-pin"
+            style={{ animationDelay: pin_delay(i * 0.15) }}
           />
         </g>
       ))}
@@ -85,7 +91,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy={y}
             r="3"
             fill="currentColor"
-            opacity="0.6"
+            className="eda-pin"
+            style={{ animationDelay: pin_delay(0.9 - i * 0.15) }}
           />
         </g>
       ))}
@@ -106,7 +113,8 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy="30"
             r="3"
             fill="currentColor"
-            opacity="0.6"
+            className="eda-pin eda-pin-fast"
+            style={{ animationDelay: pin_delay(i * 0.2) }}
           />
         </g>
       ))}
@@ -127,13 +135,14 @@ export function EdaIcon({ className }: EdaIconProps) {
             cy="130"
             r="3"
             fill="currentColor"
-            opacity="0.6"
+            className="eda-pin eda-pin-fast"
+            style={{ animationDelay: pin_delay(0.6 - i * 0.2) }}
           />
         </g>
       ))}
 
       {/* Clock signal indicator in chip center */}
-      <g opacity="0.5">
+      <g className="eda-clock">
         <circle
           cx="100"
           cy="80"

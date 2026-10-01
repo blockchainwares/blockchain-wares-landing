@@ -11,7 +11,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Browser window frame */}
-      <g>
+      <g className="frontend-window">
         <rect
           x="30"
           y="10"
@@ -42,9 +42,9 @@ export function FrontendIcon({ className }: FrontendIconProps) {
       </g>
 
       {/* Component tree inside browser */}
-      <g>
+      <g className="frontend-tree">
         {/* Root component */}
-        <g>
+        <g className="frontend-root">
           <rect
             x="38"
             y="36"
@@ -81,7 +81,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
         </g>
 
         {/* Dashed lines — props flow from root to children */}
-        <g>
+        <g className="frontend-props">
           <line
             x1="72"
             y1="60"
@@ -107,7 +107,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
         </g>
 
         {/* Left child component */}
-        <g>
+        <g className="frontend-child-0">
           <rect
             x="42"
             y="70"
@@ -154,7 +154,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
         </g>
 
         {/* Right child component */}
-        <g>
+        <g className="frontend-child-1">
           <rect
             x="104"
             y="70"
@@ -192,6 +192,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
 
         {/* Dashed line — props flow from right child to grandchild */}
         <line
+          className="frontend-props"
           x1="132"
           y1="96"
           x2="132"
@@ -204,7 +205,7 @@ export function FrontendIcon({ className }: FrontendIconProps) {
         />
 
         {/* Grandchild component (inside right child) */}
-        <g>
+        <g className="frontend-grandchild">
           <rect
             x="110"
             y="104"

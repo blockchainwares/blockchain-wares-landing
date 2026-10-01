@@ -76,7 +76,7 @@ export function EventCard({ event, status }: EventCardProps) {
         "bg-base-200/30 backdrop-blur-sm",
         "border",
         theme.card,
-        "shadow-card",
+        "shadow-card transition-shadow duration-300",
         "hover:shadow-card-hover",
       )}
     >
@@ -119,7 +119,7 @@ export function EventCard({ event, status }: EventCardProps) {
             <a
               href={get_event_path(event)}
               className={cn(
-                "rounded-sm underline-offset-4",
+                "rounded-sm underline-offset-4 transition-colors duration-150",
                 "hover:underline focus-visible:underline",
                 theme.heading_link,
               )}
@@ -201,6 +201,8 @@ export function EventCard({ event, status }: EventCardProps) {
             rel="noopener noreferrer"
             className={cn(
               "inline-flex w-fit items-center gap-2 rounded-full px-1 py-1 text-sm font-semibold",
+              "transition-[color,transform] duration-150",
+              "hover:translate-x-0.5",
               "focus-visible:outline-none focus-visible:ring-2",
               theme.link,
             )}

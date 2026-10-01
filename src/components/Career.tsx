@@ -1,5 +1,6 @@
 import { cn } from "../lib/utils";
 import { Button, SectionHeader, SectionWrapper } from "./ui";
+import { useScrollAnimation } from "../hooks";
 
 interface JobPosition {
   title: string;
@@ -39,8 +40,11 @@ const JOB_POSITIONS: JobPosition[] = [
  * Displays job openings
  */
 export function Career() {
+  const { ref, is_visible } = useScrollAnimation<HTMLElement>();
+
   return (
     <section
+      ref={ref}
       id="career"
       className="relative min-h-screen flex items-center py-16 md:py-24 lg:py-32 px-4"
     >
@@ -50,12 +54,18 @@ export function Career() {
           title="Join Our"
           accent="Team"
           description="We're constantly looking for ambitious developers willing to take on tough cases in productive environment. At the moment we have opened positions for:"
+          isVisible={is_visible}
           className="mb-12 md:mb-16"
         />
 
         <div className="flex flex-wrap justify-center gap-6">
-          {JOB_POSITIONS.map((position) => (
-            <JobPositionCard key={position.title} {...position} />
+          {JOB_POSITIONS.map((position, index) => (
+            <JobPositionCard
+              key={position.title}
+              {...position}
+              index={index}
+              is_visible={is_visible}
+            />
           ))}
         </div>
       </SectionWrapper>
@@ -63,14 +73,24 @@ export function Career() {
   );
 }
 
+interface JobPositionCardProps extends JobPosition {
+  index: number;
+  is_visible: boolean;
+}
+
 /**
  * Individual job position card with hover effects
  */
-function JobPositionCard({ title, description }: JobPosition) {
+function JobPositionCard({
+  title,
+  description,
+  index,
+  is_visible,
+}: JobPositionCardProps) {
   const handle_apply = () => {
     const contact_section = document.getElementById("contact");
     if (contact_section) {
-      contact_section.scrollIntoView();
+      contact_section.scrollIntoView({ behavior: "smooth" });
     } else {
       window.location.href = "mailto:contact@blockchainwares.pl";
     }
@@ -83,7 +103,11 @@ function JobPositionCard({ title, description }: JobPosition) {
         "bg-base-200/30 backdrop-blur-sm",
         "border border-white/5",
         "shadow-card",
-        "hover:shadow-card-hover"
+        "transition-shadow duration-300",
+        "hover:shadow-card-hover",
+        "fade-up",
+        `stagger-${index + 3}`,
+        is_visible && "is-visible"
       )}
     >
       <div className="relative z-20 flex-1">

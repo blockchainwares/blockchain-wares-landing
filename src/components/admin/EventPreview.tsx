@@ -79,7 +79,7 @@ const STAGE_STYLE: CSSProperties = {
 };
 
 const TAB_CLASS =
-  "rounded-md border px-2.5 py-1 text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
+  "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary";
 const TAB_ACTIVE = "border-secondary/50 bg-secondary/15 text-secondary";
 const TAB_IDLE =
   "border-base-300 bg-base-200 text-base-content/70 hover:border-secondary/40 hover:text-secondary";
