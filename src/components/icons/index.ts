@@ -1,11 +1,8 @@
 export { BlockchainIcon } from "./BlockchainIcon";
 export { DatabaseIcon } from "./DatabaseIcon";
-export { DevOpsIcon } from "./DevOpsIcon";
 export { DocsIcon } from "./DocsIcon";
 export { EdaIcon } from "./EdaIcon";
 export { EngineeringIcon } from "./EngineeringIcon";
 export { FrontendIcon } from "./FrontendIcon";
 export { HiveIcon } from "./HiveIcon";
-export { PythonIcon } from "./PythonIcon";
 export { SdkIcon } from "./SdkIcon";
-export { SecurityIcon } from "./SecurityIcon";
