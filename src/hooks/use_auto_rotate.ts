@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const AUTO_ROTATE_INTERVAL = 15000;
 
-
 interface UseAutoRotateOptions {
   /** Total number of items to cycle through */
   count: number;
@@ -10,6 +9,8 @@ interface UseAutoRotateOptions {
   active_index: number;
   /** Callback to change the active index */
   on_change: (index: number) => void;
+  /** Whether the rotating element intersects the viewport; rotation pauses while false */
+  in_view?: boolean;
 }
 
 interface UseAutoRotateReturn {
@@ -26,18 +27,20 @@ interface UseAutoRotateReturn {
  *
  * - Cycles forward every AUTO_ROTATE_INTERVAL ms
  * - Stops permanently on user interaction
- * - Pauses when document tab is hidden
+ * - Pauses when document tab is hidden or the element is out of view
  */
 export function useAutoRotate({
   count,
   active_index,
   on_change,
+  in_view = true,
 }: UseAutoRotateOptions): UseAutoRotateReturn {
-  const [is_auto_playing, set_is_auto_playing] = useState(true);
+  const [user_stopped, set_user_stopped] = useState(false);
+  const [is_document_hidden, set_is_document_hidden] = useState(false);
   const [progress_key, set_progress_key] = useState(0);
+  const is_auto_playing = !user_stopped && !is_document_hidden && in_view;
 
   const timer_ref = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const user_stopped_ref = useRef(false);
 
   const clear_timer = useCallback(() => {
     if (timer_ref.current) {
@@ -61,8 +64,7 @@ export function useAutoRotate({
     (index: number) => {
       clear_timer();
       on_change(index);
-      user_stopped_ref.current = true;
-      set_is_auto_playing(false);
+      set_user_stopped(true);
     },
     [clear_timer, on_change]
   );
@@ -79,24 +81,24 @@ export function useAutoRotate({
     };
   }, [is_auto_playing, schedule_next]);
 
-  /** Pause/resume on document visibility change */
+  /** A resumed rotation starts a fresh interval, so the progress bar restarts with it */
+  const was_playing_ref = useRef(is_auto_playing);
   useEffect(() => {
-    function handle_visibility_change() {
-      if (user_stopped_ref.current) return;
-      if (document.hidden) {
-        set_is_auto_playing(false);
-      } else {
-        set_is_auto_playing(true);
-        set_progress_key((k) => k + 1);
-      }
+    if (is_auto_playing && !was_playing_ref.current) {
+      set_progress_key((k) => k + 1);
+    }
+    was_playing_ref.current = is_auto_playing;
+  }, [is_auto_playing]);
+
+  useEffect(() => {
+    function sync_visibility() {
+      set_is_document_hidden(document.hidden);
     }
 
-    document.addEventListener("visibilitychange", handle_visibility_change);
+    sync_visibility();
+    document.addEventListener("visibilitychange", sync_visibility);
     return () => {
-      document.removeEventListener(
-        "visibilitychange",
-        handle_visibility_change
-      );
+      document.removeEventListener("visibilitychange", sync_visibility);
     };
   }, []);
 

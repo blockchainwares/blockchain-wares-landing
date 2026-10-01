@@ -65,6 +65,11 @@ function blobStyle(blob: Blob): string {
 ---
 
 <Layout>
+  <noscript>
+    <style is:inline>
+      #splash-screen { display: none !important; }
+    </style>
+  </noscript>
   <!-- Static SSR Splash Screen — renders immediately without JS hydration -->
   <div
     id="splash-screen"
@@ -148,17 +153,26 @@ function blobStyle(blob: Blob): string {
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
 
-        // Schedule fade out after 2.5s
+        var finished = false;
+        function finish() {
+          if (finished) return;
+          finished = true;
+          splash.remove();
+          markSeen();
+          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
+        }
+
+        // Schedule fade out after 2.5s; hold_splash() in tests/navigation_scroll_lock.spec.ts
+        // recognises this timer by its exact 2500 ms delay
         setTimeout(function() {
           splash.style.transition = 'opacity 0.5s ease-in-out';
           splash.style.opacity = '0';
 
-          splash.addEventListener('transitionend', function() {
-            splash.remove();
-            markSeen();
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-          }, { once: true });
+          splash.addEventListener('transitionend', finish, { once: true });
+          // transitionend never fires in a background tab or without a running
+          // transition, and the scroll lock must not outlive the splash.
+          setTimeout(finish, 1000);
         }, 2500);
       })();
     </script>

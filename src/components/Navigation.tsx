@@ -121,19 +121,31 @@ export function Navigation({ currentPath = "/" }: NavigationProps) {
     set_is_open(false);
   };
 
-  // Prevent body scroll when mobile menu is open
+  // Lock only while the drawer is open — clearing it on mount would release
+  // the splash screen's lock on <body> before the intro finishes
   useEffect(() => {
-    if (is_open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    // Cleanup function to restore scroll on unmount
+    if (!is_open) return;
+    const body_style = document.body.style;
+    body_style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      // The splash locks <html> and <body> alike (the drawer only <body>) and
+      // its finish() clears both, so a locked <html> means the splash still owns it
+      const splash_locked =
+        document.documentElement.style.overflow === "hidden";
+      body_style.overflow = splash_locked ? "hidden" : "";
     };
   }, [is_open]);
+
+  // The drawer has no `md:hidden` of its own — widening past the hamburger
+  // breakpoint (Tailwind `md`, 48rem) must close it, or the lock outlives it
+  useEffect(() => {
+    const desktop_query = window.matchMedia("(min-width: 48rem)");
+    const handle_change = (event: MediaQueryListEvent) => {
+      if (event.matches) set_is_open(false);
+    };
+    desktop_query.addEventListener("change", handle_change);
+    return () => desktop_query.removeEventListener("change", handle_change);
+  }, []);
 
   // The closed drawer is `inert`, so the browser drops focus to <body> when it
   // closes — hand focus back to the trigger so keyboard users keep their place

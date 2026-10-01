@@ -31,12 +31,14 @@ const SectionContent = memo(function SectionContent({
         {hero_icon ? (
           <div
             className={cn(
-              "shrink-0 text-secondary",
+              "relative isolate shrink-0 text-secondary",
               "w-20 h-20 md:w-28 md:h-28",
-              "drop-shadow-[0_0_24px_rgba(34,211,238,0.18)]"
             )}
+            data-hero-icon=""
             aria-hidden="true"
           >
+            {/* Pre-blurred gradient instead of a CSS filter, which over infinitely animated SVG children repaints every frame */}
+            <span className="pointer-events-none absolute -inset-6 -z-10 bg-[radial-gradient(circle_closest-side,color-mix(in_oklab,var(--color-cyan-400)_18%,transparent),transparent)]" />
             {hero_icon}
           </div>
         ) : null}
@@ -85,9 +87,12 @@ export const ContentPanel = memo(function ContentPanel({
             className={cn(
               "col-start-1 row-start-1",
               "transition-opacity duration-350 ease-[cubic-bezier(0.44,0,0.56,1)]",
-              is_active ? "opacity-100" : "hidden md:block md:opacity-0 md:pointer-events-none"
+              is_active
+                ? "opacity-100"
+                : "hidden md:block md:opacity-0 md:pointer-events-none",
             )}
             aria-hidden={!is_active}
+            data-active={is_active ? "true" : "false"}
             style={{ pointerEvents: is_active ? "auto" : "none" }}
           >
             <SectionContent section={section} />

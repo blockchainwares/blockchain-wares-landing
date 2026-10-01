@@ -2,12 +2,9 @@ import type { ReactNode } from "react";
 import {
   BlockchainIcon,
   DatabaseIcon,
-  DevOpsIcon,
   EdaIcon,
   EngineeringIcon,
   FrontendIcon,
-  PythonIcon,
-  SecurityIcon,
 } from "./icons";
 import { createElement } from "react";
 
@@ -15,7 +12,7 @@ export interface ExpertiseItem {
   id: string;
   title: string;
   description: string;
-  icon: ReactNode;
+  icon?: ReactNode;
 }
 
 export const EXPERTISE_ITEMS: ExpertiseItem[] = [
@@ -59,21 +56,18 @@ export const EXPERTISE_ITEMS: ExpertiseItem[] = [
     title: "Python & Automation",
     description:
       "From CLI and TUI wallets powered by Textual and Typer to Cython bindings bridging C++ performance into Python, we deliver robust automation tooling. We use Poetry for reproducible environments, pytest for comprehensive test coverage, and integrate ML pipelines with OLLAMA for semantic search and data processing.",
-    icon: createElement(PythonIcon, { className: "w-full h-full" }),
   },
   {
     id: "security",
     title: "Security & Cryptography",
     description:
       "Security is a first-class concern in everything we ship. We developed Beekeeper — a standalone key management daemon with session isolation — and built the MetaMask Snap for Hive, deriving keys via BIP44 and passing a Hacken security audit. Our libraries implement AES-256 encryption, WebWorker isolation, and hierarchical authority models.",
-    icon: createElement(SecurityIcon, { className: "w-full h-full" }),
   },
   {
     id: "devops",
     title: "DevOps & Infrastructure",
     description:
       "We maintain Docker-based multi-stage build pipelines and GitLab CI/CD workflows for continuous delivery across all our projects. We compile C++ and TypeScript libraries to WebAssembly via Emscripten, enabling high-performance browser runtimes, and run automated cross-browser test matrices to guarantee reliability at every release.",
-    icon: createElement(DevOpsIcon, { className: "w-full h-full" }),
   },
 ];
 
