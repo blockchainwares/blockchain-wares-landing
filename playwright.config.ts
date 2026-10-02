@@ -54,6 +54,9 @@ export const LOG_FIXTURE_FILE = join(tmpdir(), "bw-e2e", "access.log");
 /** Hasło serwera testowego. Jawne celowo — istnieje tylko w procesie uruchomionym przez Playwright. */
 export const E2E_ADMIN_PASSWORD = "playwright-e2e-local-only";
 
+/** Deterministyczna wersja serwera testowego; panel pokazuje jej pierwsze 7 znaków. */
+export const E2E_APP_VERSION_SHA = "0123abcdef4567890123abcdef4567890123abcd";
+
 /** Testy bez JavaScriptu chodzą w osobnym projekcie — reszta ich nie uruchamia. */
 export const NO_JS_TAG = "@no-js";
 
@@ -154,6 +157,9 @@ export default defineConfig({
         EVENTS_API_URL: EVENTS_API_BASE_URL,
         EVENTS_API_KEY: E2E_EVENTS_API_KEY,
         EVENTS_API_TTL_SECONDS,
+        // VERCEL_GIT_COMMIT_SHA wygrywa z APP_VERSION_SHA — zerowane, żeby wersja była stała.
+        VERCEL_GIT_COMMIT_SHA: "",
+        APP_VERSION_SHA: E2E_APP_VERSION_SHA,
       },
     },
   ],

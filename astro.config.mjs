@@ -1,4 +1,5 @@
 // @ts-check
+import { execSync } from "node:child_process";
 import { defineConfig } from "astro/config";
 
 import react from "@astrojs/react";
@@ -29,6 +30,36 @@ function drop_trailing_slash(url) {
   return parsed.href;
 }
 
+const APP_VERSION_FALLBACK = "dev";
+const APP_VERSION_LENGTH = 7;
+
+/** @returns {string} */
+function read_git_head() {
+  try {
+    return execSync("git rev-parse HEAD", {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: 2000,
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Wersja widoczna w panelu, liczona raz w czasie builda. Deploy idzie recznie przez
+ * `vercel` CLI, wiec VERCEL_GIT_COMMIT_SHA bywa puste, a na Vercelu nie ma `.git`.
+ *
+ * @returns {string}
+ */
+function resolve_app_version() {
+  const sha =
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.APP_VERSION_SHA ||
+    read_git_head();
+  return sha ? sha.slice(0, APP_VERSION_LENGTH) : APP_VERSION_FALLBACK;
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: SITE,
@@ -56,5 +87,8 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    define: {
+      __APP_VERSION__: JSON.stringify(resolve_app_version()),
+    },
   },
 });
