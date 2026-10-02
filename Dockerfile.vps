@@ -1,0 +1,36 @@
+# Repo celowo zostaje na adapterze @astrojs/vercel (produkcja = Vercel, ADR 6a8d79e7).
+# Instancja VPS jest dodatkowa, wiec adapter podmieniamy tylko w kopii astro.config.mjs
+# wewnatrz obrazu — klon repo na VPS zostaje czysty (pattern vps-deploy-workflow).
+FROM node:24-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+RUN npm i --no-audit --no-fund @astrojs/node@9.5.5
+COPY . .
+RUN sed -i \
+      -e 's#^import vercel from "@astrojs/vercel";#import node from "@astrojs/node";#' \
+      -e 's#adapter: vercel({[^}]*}),#adapter: node({ mode: "standalone" }),#' \
+      astro.config.mjs \
+ && grep -q 'import node from "@astrojs/node";' astro.config.mjs \
+ && grep -q 'adapter: node({ mode: "standalone" }),' astro.config.mjs \
+ && ! grep -qE '@astrojs/vercel|adapter: vercel\(' astro.config.mjs
+ARG APP_VERSION_SHA
+ENV APP_VERSION_SHA=$APP_VERSION_SHA
+RUN npm run build && test -f dist/server/entry.mjs
+
+FROM node:24-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=4321
+
+# pelne node_modules, nie --omit=dev: sharp jest potrzebny w runtime dla /_image
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/package.json ./
+
+USER node
+EXPOSE 4321
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget --spider -q http://127.0.0.1:4321/ || exit 1
+CMD ["node", "./dist/server/entry.mjs"]
